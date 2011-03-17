@@ -39,21 +39,10 @@
 
 #include <Alembic/AbcGeom/Foundation.h>
 #include <Alembic/AbcGeom/SchemaInfoDeclarations.h>
-
-#include <boost/uuid/uuid.hpp>
-#include <boost/uuid/uuid_generators.hpp>
+#include <Alembic/AbcGeom/XformOp.h>
 
 namespace Alembic {
 namespace AbcGeom {
-
-// forward for sample
-class XformSample;
-
-//! The default value for determining whether a property is actually
-//! different from the default.  If it's within this tolerance, the
-//! default value is used, which allows Alembic to more efficiently
-//! store the data, resulting in smaller Archive size.
-static const double kXFORM_DELTA_TOLERANCE = 1.0e-9;
 
 //-*****************************************************************************
 class OXformSchema : public Abc::OSchema<XformSchemaInfo>
@@ -65,9 +54,7 @@ public:
 
     //! By convention we always define this_type in AbcGeom classes.
     //! Used by unspecified-bool-type conversion below
-    typedef Abc::OSchema<XformSchemaInfo> super_type;
     typedef OXformSchema this_type;
-    typedef XformSample sample_type;
 
     //-*************************************************************************
     // CONSTRUCTION, DESTRUCTION, ASSIGNMENT
@@ -86,27 +73,25 @@ public:
     //! MetaData, and to set TimeSamplingType.
     template <class CPROP_PTR>
     OXformSchema( CPROP_PTR iParentObject,
-                  const std::string &iName,
-                  const Abc::OArgument &iArg0 = Abc::OArgument(),
-                  const Abc::OArgument &iArg1 = Abc::OArgument(),
-                  const Abc::OArgument &iArg2 = Abc::OArgument() )
+                     const std::string &iName,
+                     const Abc::OArgument &iArg0 = Abc::OArgument(),
+                     const Abc::OArgument &iArg1 = Abc::OArgument(),
+                     const Abc::OArgument &iArg2 = Abc::OArgument() )
       : Abc::OSchema<XformSchemaInfo>( iParentObject, iName,
-                                       iArg0, iArg1, iArg2 )
+                                            iArg0, iArg1, iArg2 )
     {
         // Meta data and error handling are eaten up by
         // the super type, so all that's left is time sampling.
         init( Abc::GetTimeSamplingType( iArg0, iArg1, iArg2 ) );
     }
 
-    //! This constructor does the same as the above, but uses the default
-    //! name from the XformSchemaInfo struct.
     template <class CPROP_PTR>
     explicit OXformSchema( CPROP_PTR iParentObject,
-                           const Abc::OArgument &iArg0 = Abc::OArgument(),
-                           const Abc::OArgument &iArg1 = Abc::OArgument(),
-                           const Abc::OArgument &iArg2 = Abc::OArgument() )
+                              const Abc::OArgument &iArg0 = Abc::OArgument(),
+                              const Abc::OArgument &iArg1 = Abc::OArgument(),
+                              const Abc::OArgument &iArg2 = Abc::OArgument() )
       : Abc::OSchema<XformSchemaInfo>( iParentObject,
-                                       iArg0, iArg1, iArg2 )
+                                            iArg0, iArg1, iArg2 )
     {
         // Meta data and error handling are eaten up by
         // the super type, so all that's left is time sampling.
@@ -120,8 +105,10 @@ public:
     // SCHEMA STUFF
     //-*************************************************************************
 
+    //! Return the time sampling type, which is stored on each of the
+    //! sub properties.
     AbcA::TimeSamplingType getTimeSamplingType() const
-    { return m_timeSamplingType; }
+    { return m_anim.getTimeSamplingType(); }
 
     //-*************************************************************************
     // SAMPLE STUFF
@@ -129,16 +116,34 @@ public:
 
     //! Get number of samples written so far.
     //! ...
-    size_t getNumSamples() const { return m_numSetSamples; }
+    size_t getNumSamples()
+    { return m_anim.getNumSamples(); }
 
-    //! Set an animated sample.  On first call to set, the sample is modified,
-    //! so it can't be const.
-    void set( XformSample &ioSamp,
+    //! Sets up the xform operations. This function be called before calling
+    //! set.
+    //! \param iOp Operations (translate, rotate scale) which make up the
+    //! the transform and decides what is static, and what is animated.
+    //! \param iStatic For the parts of the operations that do not change
+    void setXform( const XformOpVec & iOp,
+        const Abc::DoubleArraySample & iStatic );
+
+    //! Set an animated sample.  setXform needs to be called first.
+    void set( const Abc::DoubleArraySample & iAnim,
               const Abc::OSampleSelector &iSS = Abc::OSampleSelector() );
 
+    //! Set the inherits transform hint
+    void setInherits(bool iInherits,
+                     const Abc::OSampleSelector &iSS = Abc::OSampleSelector() );
 
     //! Set from previous sample. Will hold the animated channels.
     void setFromPrevious( const Abc::OSampleSelector &iSS );
+
+    //! Normally, setting the child bounds is done through the Sample, but
+    //! this Xform implementation is non-standard.
+    void setChildBounds( const Abc::Box3d &iBnds,
+                         const Abc::OSampleSelector &iSS =
+                         Abc::OSampleSelector() )
+    { m_childBounds.set( iBnds, iSS ); }
 
     //-*************************************************************************
     // ABC BASE MECHANISMS
@@ -150,111 +155,37 @@ public:
     //! state.
     void reset()
     {
+        m_anim.reset();
+        m_inherits.reset();
+        m_writtenOps = false;
+        m_numAnimated = 0;
         m_childBounds.reset();
-        m_timeSamplingType = AbcA::TimeSamplingType();
-        m_isToWorld.reset();
-        m_numSetSamples = 0;
-        m_sampID = m_nilGen();
-        m_ops.reset();
-        m_props.clear();
-        m_props.resize( 0 );
-        super_type::reset();
+        m_time = AbcA::TimeSamplingType();
+        Abc::OSchema<XformSchemaInfo>::reset();
     }
 
     //! Valid returns whether this function set is valid.
     bool valid() const
     {
-        return ( m_ops && super_type::valid() );
+        return ( Abc::OSchema<XformSchemaInfo>::valid() );
     }
 
     //! unspecified-bool-type operator overload.
     //! ...
-    ALEMBIC_OVERRIDE_OPERATOR_BOOL( this_type::valid() );
+    ALEMBIC_OVERRIDE_OPERATOR_BOOL( OXformSchema::valid() );
 
-
-private:
+protected:
     void init( const AbcA::TimeSamplingType &iTst );
-    boost::uuids::nil_generator m_nilGen;
 
-protected:
-    //-*************************************************************************
-    // HELPER CLASS
-    //-*************************************************************************
-
-    //! The defaulted double property will only create a property
-    //! and only bother setting a value when it the value differs from a
-    //! known default value. This allows transforms to disappear when they
-    //! are identity.
-    //! It has some Xform-specific stuff in here, so not worth
-    //! making general (yet).
-    class ODefaultedDoubleProperty
-    {
-    public:
-        void reset()
-        {
-            m_parent.reset();
-            m_name = "";
-            m_errorHandlerPolicy = Abc::ErrorHandler::kThrowPolicy;
-            m_default = 0.0;
-            m_epsilon = kXFORM_DELTA_TOLERANCE;
-            m_property.reset();
-        }
-
-        ODefaultedDoubleProperty() { reset(); }
-
-        ODefaultedDoubleProperty( AbcA::CompoundPropertyWriterPtr iParent,
-                                  const std::string &iName,
-                                  Abc::ErrorHandler::Policy iPolicy,
-                                  double iDefault,
-                                  double iEpsilon=kXFORM_DELTA_TOLERANCE )
-          : m_parent( Abc::GetCompoundPropertyWriterPtr( iParent ) )
-          , m_name( iName )
-          , m_errorHandlerPolicy( iPolicy )
-          , m_default( iDefault )
-          , m_epsilon( iEpsilon )
-        {
-            // We don't build the property until we need it for sure.
-        }
-
-        void set( const double &iSamp,
-                  const Abc::OSampleSelector &iSS,
-                  const std::size_t &iNumSampsSoFar );
-
-        void setFromPrevious( const Abc::OSampleSelector &iSS );
-
-        double getDefaultValue() const { return m_default; }
-
-    protected:
-        // Parent.
-        AbcA::CompoundPropertyWriterPtr m_parent;
-
-        // We cache the init stuff.
-        std::string m_name;
-        Abc::ErrorHandler::Policy m_errorHandlerPolicy;
-        double m_default;
-        double m_epsilon;
-
-        // The "it". This may not exist.
-        Abc::ODoubleProperty m_property;
-    }; // END DEFAULTED DOUBLE PROPERTY CLASS DECLARATION
-
-
-protected:
-    // Number of set samples.
-    std::size_t m_numSetSamples;
+    Abc::ODoubleArrayProperty m_anim;
+    Abc::OBoolProperty m_inherits;
 
     Abc::OBox3dProperty m_childBounds;
 
-    AbcA::TimeSamplingType m_timeSamplingType;
-
-    Abc::OUcharArrayProperty m_ops;
-
-    std::vector<ODefaultedDoubleProperty> m_props;
-
-    Abc::OBoolProperty m_isToWorld;
-
-    // ensure that our sample is kept pristine.
-    boost::uuids::uuid m_sampID;
+private:
+    bool m_writtenOps;
+    size_t m_numAnimated;
+    AbcA::TimeSamplingType m_time;
 };
 
 //-*****************************************************************************
