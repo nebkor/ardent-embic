@@ -414,7 +414,7 @@ void readPoly(double iFrame, MFnMesh & ioMesh, MObject & iParent,
     fillPoints(pointArray, samp.getPositions(), ceilPoints, alpha);
 
     fillTopology(ioMesh, iParent, pointArray, samp.getFaceIndices(),
-                 samp.getFaceCounts());
+        samp.getFaceCounts());
 
     setPolyNormals(iFrame, ioMesh, schema.getNormals());
     setUVs(iFrame, ioMesh, schema.getUVs());
@@ -534,7 +534,7 @@ MObject createPoly(double iFrame, Alembic::AbcGeom::IPolyMesh & iNode,
 
         fillPoints(ptArray, samp.getPositions(), ceilPoints, alpha);
         fillTopology(fnMesh, iParent, ptArray, samp.getFaceIndices(),
-                     samp.getFaceCounts());
+            samp.getFaceCounts());
         fnMesh.setName(iNode.getName().c_str());
         setPolyNormals(iFrame, fnMesh, schema.getNormals());
         setUVs(iFrame, fnMesh, schema.getUVs());
