@@ -66,9 +66,9 @@ public:
 
         Abc::Box3d getSelfBounds() const { return m_selfBounds; }
         Abc::Box3d getChildBounds() const { return m_childBounds; }
-        
+
         // trim curve
-	size_t getTrimNumLoops() const { return m_trimNumLoops; }
+	uint64_t getTrimNumLoops() const { return m_trimNumLoops; }
 	Abc::UInt64ArraySamplePtr getTrimNumVertices() const { return m_trimNumVertices; }
 	Abc::UInt64ArraySamplePtr getTrimNumCurves() const { return m_trimNumCurves; }
 	Abc::UInt64ArraySamplePtr getTrimOrders() const { return m_trimOrder; }
@@ -79,13 +79,13 @@ public:
 	Abc::FloatArraySamplePtr getTrimV() const { return m_trimV; }
 	Abc::FloatArraySamplePtr getTrimW() const { return m_trimW; }
 
-        
+
         bool hasTrimCurve() const { return m_trimNumLoops != 0; }
-        
+
         bool valid() const
         {
             return m_positions && m_numU && m_numV && m_uOrder && m_vOrder &&
-		   m_uKnot && m_vKnot;
+                m_uKnot && m_vKnot;
         }
 
         void reset()
@@ -97,10 +97,10 @@ public:
             m_vOrder = 1;
             m_uKnot.reset();
             m_vKnot.reset();
-	    
+
             m_selfBounds.makeEmpty();
             m_childBounds.makeEmpty();
-            
+
             // trim curve
             m_trimNumLoops = 0;
             m_trimNumCurves.reset();
@@ -117,9 +117,9 @@ public:
         ALEMBIC_OPERATOR_BOOL( valid() );
 
     protected:
-        
+
         friend class INuPatchSchema;
-        
+
         Abc::V3fArraySamplePtr m_positions;
         uint64_t m_numU;
         uint64_t m_numV;
@@ -127,7 +127,7 @@ public:
         uint64_t m_vOrder;
         Abc::FloatArraySamplePtr m_uKnot;
         Abc::FloatArraySamplePtr m_vKnot;
-    
+
         // trim curve
 	uint64_t m_trimNumLoops;
 	Abc::UInt64ArraySamplePtr m_trimNumCurves;
@@ -144,7 +144,7 @@ public:
         // bounds
         Abc::Box3d m_selfBounds;
         Abc::Box3d m_childBounds;
-        
+
     };
 
     //-*************************************************************************
@@ -178,11 +178,11 @@ public:
     //! schema interpretation matching.
     template <class CPROP_PTR>
     INuPatchSchema( CPROP_PTR iParentObject,
-                     const std::string &iName,
-                     const Abc::Argument &iArg0 = Abc::Argument(),
-                     const Abc::Argument &iArg1 = Abc::Argument() )
+                    const std::string &iName,
+                    const Abc::Argument &iArg0 = Abc::Argument(),
+                    const Abc::Argument &iArg1 = Abc::Argument() )
       : Abc::ISchema<NuPatchSchemaInfo>( iParentObject, iName,
-                                            iArg0, iArg1 )
+                                         iArg0, iArg1 )
     {
         init( iArg0, iArg1 );
     }
@@ -191,8 +191,8 @@ public:
     //! schema name used.
     template <class CPROP_PTR>
     explicit INuPatchSchema( CPROP_PTR iParent,
-                              const Abc::Argument &iArg0 = Abc::Argument(),
-                              const Abc::Argument &iArg1 = Abc::Argument() )
+                             const Abc::Argument &iArg0 = Abc::Argument(),
+                             const Abc::Argument &iArg1 = Abc::Argument() )
 
       : Abc::ISchema<NuPatchSchemaInfo>( iParent,
                                          iArg0, iArg1 )
@@ -203,15 +203,15 @@ public:
     //! Wrap an existing schema object
     template <class CPROP_PTR>
     INuPatchSchema( CPROP_PTR iThis,
-                     Abc::WrapExistingFlag iFlag,
-                     const Abc::Argument &iArg0 = Abc::Argument(),
-                     const Abc::Argument &iArg1 = Abc::Argument() )
+                    Abc::WrapExistingFlag iFlag,
+                    const Abc::Argument &iArg0 = Abc::Argument(),
+                    const Abc::Argument &iArg1 = Abc::Argument() )
 
       : Abc::ISchema<NuPatchSchemaInfo>( iThis, iFlag, iArg0, iArg1 )
     {
         init( iArg0, iArg1 );
     }
-    
+
     //! Return the number of samples contained in the property.
     //! This can be any number, including zero.
     //! This returns the number of samples that were written, independently
@@ -245,11 +245,11 @@ public:
 
     Abc::IV3fArrayProperty &getPositions(){ return m_positions; }
     Abc::IBox3dProperty &getBounds() { return m_selfBounds; }
-    
+
     bool hasTrimCurve();
     bool trimCurveTopologyIsHomogenous();
     bool trimCurveTopologyIsConstant();
-    
+
     ICompoundProperty getArbGeomParams() { return m_arbGeomParams; }
 
     //-*************************************************************************
@@ -264,29 +264,29 @@ public:
     {
         m_positions.reset();
         m_numU.reset();
-       m_numV.reset();
+        m_numV.reset();
         m_uOrder.reset();
         m_vOrder.reset();
         m_uKnot.reset();
         m_vKnot.reset();
-        
+
         m_normals.reset();
         m_uvs.reset();
 
         m_selfBounds.reset();
         m_childBounds.reset();
-        
+
         // reset trim curve attributes
-		m_trimNumLoops.reset();
+        m_trimNumLoops.reset();
         m_trimNumCurves.reset();
-		m_trimNumVertices.reset();
-		m_trimOrder.reset();
-		m_trimKnot.reset();
-		m_trimMin.reset();
-		m_trimMax.reset();
-		m_trimU.reset();
-		m_trimV.reset();
-		m_trimW.reset();
+        m_trimNumVertices.reset();
+        m_trimOrder.reset();
+        m_trimKnot.reset();
+        m_trimMin.reset();
+        m_trimMax.reset();
+        m_trimU.reset();
+        m_trimV.reset();
+        m_trimW.reset();
 
         Abc::ISchema<NuPatchSchemaInfo>::reset();
     }
@@ -321,11 +321,11 @@ protected:
     Abc::IUInt64Property m_vOrder;
     Abc::IFloatArrayProperty m_uKnot;
     Abc::IFloatArrayProperty m_vKnot;
-        
+
     // optional
     IN3fGeomParam m_normals;
     IV2fGeomParam m_uvs;
-    
+
     // optional trim curve properties
     Abc::IUInt64Property m_trimNumLoops;
     Abc::IUInt64ArrayProperty m_trimNumVertices;
@@ -341,7 +341,7 @@ protected:
     // bounds
     Abc::IBox3dProperty m_selfBounds;
     Abc::IBox3dProperty m_childBounds;
-    
+
     Abc::ICompoundProperty m_arbGeomParams;
 };
 
