@@ -56,7 +56,7 @@ public:
     public:
         //! Creates a default sample with no data in it.
         //! ...
-        Sample() {}
+        Sample() { reset(); }
 
         Sample(
                 const Abc::V3fArraySample &iPos,
@@ -357,7 +357,7 @@ public:
     size_t getNumSamples()
     { return m_positions.getNumSamples(); }
 
-    //! Set a sample! 
+    //! Set a sample!
     void set( const sample_type &iSamp );
 
     //! Set from previous sample. Will apply to each of positions,
@@ -383,7 +383,7 @@ public:
         m_vOrder.reset();
         m_uKnot.reset();
         m_vKnot.reset();
-        
+
         m_normals.reset();
         m_uvs.reset();
 

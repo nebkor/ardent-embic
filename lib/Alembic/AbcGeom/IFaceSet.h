@@ -58,7 +58,7 @@ public:
         typedef Sample this_type;
 
         //! Users never create this data directly
-        Sample() {}
+        Sample() { reset(); }
 
         // main stuff
         Abc::Int32ArraySamplePtr getFaces() const { return m_faces; }
@@ -170,7 +170,7 @@ public:
 
 
     //! if isConstant() is true, the mesh contains no time-varying values
-    bool isConstant() { return (m_facesProperty.isConstant () 
+    bool isConstant() { return (m_facesProperty.isConstant ()
         && m_visibilityProperty.isConstant ()); }
 
     //-*************************************************************************
