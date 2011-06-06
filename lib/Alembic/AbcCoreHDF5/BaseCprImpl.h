@@ -38,6 +38,7 @@
 #define _Alembic_AbcCoreHDF5_BaseCprImpl_h_
 
 #include <Alembic/AbcCoreHDF5/Foundation.h>
+#include <boost/thread/mutex.hpp>
 
 namespace Alembic {
 namespace AbcCoreHDF5 {
@@ -100,8 +101,14 @@ protected:
     typedef std::map<std::string, size_t> SubPropertiesMap;
     typedef std::vector<SubProperty> SubPropertyVec;
 
+    // Allocated mutexes, one per SubProperty
+    boost::mutex * m_subPropertyMutexes;
     SubPropertyVec m_propertyHeaders;
     SubPropertiesMap m_subProperties;
+private:
+    // We aren't copyable
+    BaseCprImpl( const BaseCprImpl & input);
+    const BaseCprImpl & operator=(const BaseCprImpl & rhs);
 };
 
 } // End namespace ALEMBIC_VERSION_NS
