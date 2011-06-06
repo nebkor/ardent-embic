@@ -71,6 +71,7 @@ public:
             // even though this might not be written out
             // (unless curvesNumVertices and points is set) give some reasonable
             // and predictable defaults
+            reset();
             m_type = kCubic;
             m_wrap = kNonPeriodic;
             m_basis = kBezierBasis;
