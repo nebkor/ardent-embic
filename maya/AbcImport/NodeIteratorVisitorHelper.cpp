@@ -206,15 +206,6 @@ bool addProp(Alembic::Abc::IArrayProperty & iProp, MObject & iParent)
                 val = ((int8_t *) samp->getData())[0];
             }
 
-            // visibility is handled differently from Maya's
-            // visibility model
-            if (attrName == "visible")
-            {
-                MPlug plug = parentFn.findPlug("visibility");
-                plug.setValue(val != 0);
-                return true;
-            }
-
             attrObj = numAttr.create(attrName, attrName,
                 MFnNumericData::kByte, val);
         }
@@ -269,6 +260,7 @@ bool addProp(Alembic::Abc::IArrayProperty & iProp, MObject & iParent)
             if (!iProp.isScalarLike())
             {
                 MFnIntArrayData fnData;
+                MObject arrObj;
 
                 if (iProp.isConstant())
                 {
@@ -277,16 +269,16 @@ bool addProp(Alembic::Abc::IArrayProperty & iProp, MObject & iParent)
 
                     MIntArray arr((int *) samp->getData(), samp->size());
 
-                    attrObj = fnData.create(arr);
+                    arrObj = fnData.create(arr);
                 }
                 else
                 {
                     MIntArray arr;
-                    attrObj = fnData.create(arr);
+                    arrObj = fnData.create(arr);
                 }
 
-                typedAttr.create(attrName, attrName, MFnData::kIntArray,
-                    attrObj);
+                attrObj = typedAttr.create(attrName, attrName,
+                    MFnData::kIntArray, arrObj);
             }
             // isScalarLike
             else
@@ -340,22 +332,24 @@ bool addProp(Alembic::Abc::IArrayProperty & iProp, MObject & iParent)
                 // and color array?
 
                 MFnDoubleArrayData fnData;
+                MObject arrObj;
+
                 if (iProp.isConstant())
                 {
                     Alembic::AbcCoreAbstract::v1::ArraySamplePtr samp;
                     iProp.get(samp);
 
                     MDoubleArray arr((float *) samp->getData(), samp->size());
-                    attrObj = fnData.create(arr);
+                    arrObj = fnData.create(arr);
                 }
                 else
                 {
                     MDoubleArray arr;
-                    attrObj = fnData.create(arr);
+                    arrObj = fnData.create(arr);
                 }
 
-                typedAttr.create(attrName, attrName, MFnData::kDoubleArray,
-                    attrObj);
+                attrObj = typedAttr.create(attrName, attrName,
+                    MFnData::kDoubleArray, arrObj);
 
             }
             // isScalarLike
@@ -410,22 +404,24 @@ bool addProp(Alembic::Abc::IArrayProperty & iProp, MObject & iParent)
                 // and color array?
 
                 MFnDoubleArrayData fnData;
+                MObject arrObj;
+
                 if (iProp.isConstant())
                 {
                     Alembic::AbcCoreAbstract::v1::ArraySamplePtr samp;
                     iProp.get(samp);
 
                     MDoubleArray arr((double *) samp->getData(), samp->size());
-                    attrObj = fnData.create(arr);
+                    arrObj = fnData.create(arr);
                 }
                 else
                 {
                     MDoubleArray arr;
-                    attrObj = fnData.create(arr);
+                    arrObj = fnData.create(arr);
                 }
 
-                typedAttr.create(attrName, attrName, MFnData::kDoubleArray,
-                    attrObj);
+                attrObj = typedAttr.create(attrName, attrName,
+                    MFnData::kDoubleArray, arrObj);
             }
             else
             {
@@ -483,6 +479,7 @@ bool addProp(Alembic::Abc::IArrayProperty & iProp, MObject & iParent)
             if (!iProp.isScalarLike())
             {
                 MFnStringArrayData fnData;
+                MObject arrObj;
 
                 if (iProp.isConstant())
                 {
@@ -500,16 +497,16 @@ bool addProp(Alembic::Abc::IArrayProperty & iProp, MObject & iParent)
                     {
                         arr[i] = strData[i].c_str();
                     }
-                    attrObj = fnData.create(arr);
+                    arrObj = fnData.create(arr);
                 }
                 else
                 {
                     MStringArray arr;
-                    attrObj = fnData.create(arr);
+                    arrObj = fnData.create(arr);
                 }
 
-                typedAttr.create(attrName, attrName, MFnData::kStringArray,
-                    attrObj);
+                attrObj = typedAttr.create(attrName, attrName,
+                    MFnData::kStringArray, arrObj);
             }
             // isScalarLike
             else
@@ -548,6 +545,7 @@ bool addProp(Alembic::Abc::IArrayProperty & iProp, MObject & iParent)
             if (!iProp.isScalarLike())
             {
                 MFnStringArrayData fnData;
+                MObject arrObj;
 
                 if (iProp.isConstant())
                 {
@@ -565,16 +563,16 @@ bool addProp(Alembic::Abc::IArrayProperty & iProp, MObject & iParent)
                     {
                         arr[i] = (wchar_t *)(strData[i].c_str());
                     }
-                    attrObj = fnData.create(arr);
+                    arrObj = fnData.create(arr);
                 }
                 else
                 {
                     MStringArray arr;
-                    attrObj = fnData.create(arr);
+                    arrObj = fnData.create(arr);
                 }
 
-                typedAttr.create(attrName, attrName, MFnData::kStringArray,
-                    attrObj);
+                attrObj = typedAttr.create(attrName, attrName,
+                    MFnData::kStringArray, arrObj);
             }
             // isScalarLike
             else
@@ -685,7 +683,7 @@ void addProps(Alembic::Abc::ICompoundProperty & iParent, MObject & iObject)
 //=============================================================================
 
 void getAnimatedProps(Alembic::Abc::ICompoundProperty & iParent,
-    std::vector<Alembic::Abc::IArrayProperty> & oPropList)
+    std::vector<Prop> & oPropList)
 {
     // if the arbitrary geom params aren't valid, then skip
     if (!iParent)
@@ -783,7 +781,9 @@ void getAnimatedProps(Alembic::Abc::ICompoundProperty & iParent,
             break;
         }
 
-        oPropList.push_back(prop);
+        Prop animProp;
+        animProp.mArray = prop;
+        oPropList.push_back(animProp);
     } // for i
 }
 
@@ -828,14 +828,7 @@ void readProp(double iFrame, Alembic::Abc::IArrayProperty & iProp,
 
             int8_t val;
 
-            if (iProp.getName() == "visible")
-            {
-                iProp.get(samp, index);
-
-                iHandle.setBool(((int8_t *) samp->getData())[0] != 0);
-                return;
-            }
-            else if (index != ceilIndex && alpha != 0.0)
+            if (index != ceilIndex && alpha != 0.0)
             {
                 iProp.get(samp, index);
                 iProp.get(ceilSamp, ceilIndex);
@@ -1310,8 +1303,18 @@ void WriterData::getFrameRange(double & oMin, double & oMax)
     iEnd = mPropList.size();
     for (i = 0; i < iEnd; ++i)
     {
-        ts = mPropList[i].getTimeSampling();
-        size_t numSamples = mPropList[i].getNumSamples();
+        size_t numSamples = 0;
+        if (mPropList[i].mArray.valid())
+        {
+            ts = mPropList[i].mArray.getTimeSampling();
+            numSamples = mPropList[i].mArray.getNumSamples();
+        }
+        else
+        {
+            ts = mPropList[i].mScalar.getTimeSampling();
+            numSamples = mPropList[i].mScalar.getNumSamples();
+        }
+
         if (numSamples > 1)
         {
             oMin = std::min(ts->getSampleTime(0), oMin);
@@ -1367,6 +1370,14 @@ MString createScene(ArgData & iArgData)
     Alembic::Abc::IArchive archive(Alembic::AbcCoreHDF5::ReadArchive(),
         iArgData.mFileName.asChar(), Alembic::Abc::ErrorHandler::Policy(),
         Alembic::AbcCoreAbstract::v1::ReadArraySampleCachePtr());
+    if (!archive.valid())
+    {
+        MString theError = iArgData.mFileName;
+        theError += MString(" not a valid Alembic file.");
+        printError(theError);
+        return returnName;
+    }
+
 
     CreateSceneVisitor::Action action = CreateSceneVisitor::CREATE;
     if (iArgData.mRemoveIfNoUpdate && iArgData.mCreateIfNotFound)

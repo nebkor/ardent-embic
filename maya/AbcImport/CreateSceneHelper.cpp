@@ -46,9 +46,11 @@
 #include <maya/MFnIntArrayData.h>
 #include <maya/MFnStringData.h>
 #include <maya/MFnTransform.h>
+#include <maya/MFnNumericAttribute.h>
 #include <maya/MFnNurbsCurve.h>
 #include <maya/MFnNurbsSurface.h>
 #include <maya/MFnSet.h>
+#include <maya/MFnTypedAttribute.h>
 
 #include <map>
 #include <set>
@@ -65,6 +67,56 @@
 
 namespace
 {
+    void addFaceSets(MObject & iNode, Alembic::Abc::IObject & iObj)
+    {
+        MStatus status;
+
+        MFnDependencyNode mesh(iNode, &status);
+
+        if (status != MS::kSuccess)
+            return;
+
+        std::size_t numChildren = iObj.getNumChildren();
+        for ( std::size_t i = 0 ; i < numChildren; ++i )
+        {
+            Alembic::Abc::IObject child = iObj.getChild(i);
+            if (Alembic::AbcGeom::IFaceSet::matches(child.getHeader()))
+            {
+                Alembic::AbcGeom::IFaceSet faceSet(child,
+                    Alembic::Abc::kWrapExisting);
+
+                Alembic::AbcGeom::IFaceSetSchema::Sample samp;
+                faceSet.getSchema().get(samp);
+
+                MString faceName = "FACESET_";
+                faceName += faceSet.getName().c_str();
+
+                MFnIntArrayData fnData;
+                MIntArray arr((int *) samp.getFaces()->getData(),
+                    samp.getFaces()->size());
+                MObject attrObj = fnData.create(arr);
+                MFnTypedAttribute typedAttr;
+                MObject faceObj = typedAttr.create(faceName, faceName,
+                    MFnData::kIntArray, attrObj);
+
+                mesh.addAttribute(faceObj,
+                    MFnDependencyNode::kLocalDynamicAttr);
+
+                if (!samp.isVisible())
+                {
+                    MString visName = "FACESETVIS_";
+                    visName += faceSet.getName().c_str();
+
+                    MFnNumericAttribute numAttr;
+                    MObject visObj = numAttr.create(visName, visName,
+                        MFnNumericData::kBoolean, false);
+                    mesh.addAttribute(visObj,
+                        MFnDependencyNode::kLocalDynamicAttr);
+                }
+            }
+        }
+    }
+
     void removeDagNode(MDagPath & dagPath)
     {
 
@@ -74,6 +126,45 @@ namespace
             MString theError = dagPath.partialPathName();
             theError += MString(" removal not successful");
             printError(theError);
+        }
+    }
+
+    Alembic::Abc::IScalarProperty getVisible(Alembic::Abc::IObject & iNode,
+        std::vector<Prop> & oPropList)
+    {
+        Alembic::Abc::ICompoundProperty props = iNode.getProperties();
+        const Alembic::AbcCoreAbstract::PropertyHeader * visHead =
+            props.getPropertyHeader("visible");
+
+        if (visHead != NULL && visHead->isScalar() &&
+            visHead->getDataType().getPod() == Alembic::Util::kInt8POD &&
+            visHead->getDataType().getExtent() == 1)
+        {
+            Alembic::Abc::IScalarProperty visProp(props, "visible");
+            if (!visProp.isConstant())
+            {
+                Prop prop;
+                prop.mScalar = visProp;
+                oPropList.push_back(prop);
+            }
+            return visProp;
+        }
+        return Alembic::Abc::IScalarProperty();
+    }
+
+    void setConstantVisibility(Alembic::Abc::IScalarProperty iVisProp,
+        MObject & iParent)
+    {
+        if (iVisProp.valid() && iVisProp.isConstant())
+        {
+            Alembic::Util::int8_t visVal;
+            iVisProp.get(&visVal);
+            MFnDependencyNode dep(iParent);
+            MPlug plug = dep.findPlug("visibility");
+            if (!plug.isNull())
+            {
+                plug.setBool(visVal != 0);
+            }
         }
     }
 
@@ -119,19 +210,17 @@ void CreateSceneVisitor::getData(WriterData & oData)
 
 bool CreateSceneVisitor::hasSampledData()
 {
-    unsigned int subDSize = mData.mSubDList.size();
-    unsigned int polySize = mData.mPolyMeshList.size();
-    unsigned int cameraSize = mData.mCameraList.size();
-    // Currently there's no support for bringing in particle system simulation
-    // unsigned int particleSize = mData.mParticleList.size();
-    unsigned int transopSize = mData.mXformList.size();
-    unsigned int nSurfaceSize  = 0; //mData.mNurbsList.size();
-    unsigned int nCurveSize  = 0; //mData.mCurveList.size();
-    unsigned int propSize = mData.mPropList.size();
 
-    return ( subDSize > 0 || polySize > 0 || nSurfaceSize > 0 || nCurveSize > 0
-            || transopSize > 0 || cameraSize > 0  // || particleSize > 0
-            || propSize > 0);
+    unsigned int cameraSize = mData.mCameraList.size();
+
+    // unsigned int particleSize = mData.mParticleList.size();
+    unsigned int nSurfaceSize  = 0; //mData.mNurbsList.size();
+
+    // Currently there's no support for bringing in particle system simulation
+    return (mData.mSubDList.size() > 0 || mData.mPolyMeshList.size() > 0 ||
+        mData.mCurvesList.size() > 0 || mData.mXformList.size() > 0 ||
+        mData.mCameraList.size() > 0 || mData.mPropList.size() > 0 );
+        // || mData.mNurbsList.size() > 0);
 }
 
 // re-add the selection back to the sets
@@ -157,10 +246,18 @@ void CreateSceneVisitor::addToPropList(std::size_t iFirst, MObject & iObject)
     std::vector<std::string> attrList;
     for (std::size_t i = iFirst; i < last; ++i)
     {
-        attrList.push_back(mData.mPropList[i].getName());
+        if (mData.mPropList[i].mArray.valid())
+        {
+            attrList.push_back(mData.mPropList[i].mArray.getName());
+        }
+        else
+        {
+            attrList.push_back(mData.mPropList[i].mScalar.getName());
+        }
     }
     mData.mPropObjList.push_back(SampledPair(iObject, attrList));
 }
+
 
 // remembers what sets a mesh was part of, gets those sets as a selection
 // and then clears the sets for reassignment later  this is only used when
@@ -360,6 +457,7 @@ MStatus CreateSceneVisitor::operator()(Alembic::AbcGeom::ICamera & iNode)
 
     std::size_t firstProp = mData.mPropList.size();
     getAnimatedProps(arbProp, mData.mPropList);
+    Alembic::Abc::IScalarProperty visProp = getVisible(iNode, mData.mPropList);
 
     if (mAction == CREATE || mAction == CREATE_REMOVE)
     {
@@ -370,6 +468,7 @@ MStatus CreateSceneVisitor::operator()(Alembic::AbcGeom::ICamera & iNode)
             mData.mCameraObjList.push_back(cameraObj);
         }
 
+        setConstantVisibility(visProp, cameraObj);
         addProps(arbProp, cameraObj);
 
     }
@@ -432,6 +531,7 @@ MStatus CreateSceneVisitor::operator()(Alembic::AbcGeom::ICurves & iNode)
 
     std::size_t firstProp = mData.mPropList.size();
     getAnimatedProps(arbProp, mData.mPropList);
+    Alembic::Abc::IScalarProperty visProp = getVisible(iNode, mData.mPropList);
 
     if (mAction == CREATE || mAction == CREATE_REMOVE)
     {
@@ -439,6 +539,7 @@ MStatus CreateSceneVisitor::operator()(Alembic::AbcGeom::ICurves & iNode)
             mData.mNurbsCurveObjList, numSamples > 1);
         MFnDagNode(curvesObj).getPath(mCurrentDagNode);
 
+        setConstantVisibility(visProp, curvesObj);
         addProps(arbProp, curvesObj);
 
     }
@@ -499,6 +600,12 @@ MStatus CreateSceneVisitor::operator()(Alembic::AbcGeom::IPoints& iNode)
         Alembic::Abc::ICompoundProperty arbProp =
             iNode.getSchema().getArbGeomParams();
 
+        // don't currently care about anything animated on a particleObj
+        std::vector<Prop> fakePropList;
+        Alembic::Abc::IScalarProperty visProp =
+            getVisible(iNode, fakePropList);
+
+        setConstantVisibility(visProp, particleObj);
         addProps(arbProp, particleObj);
     }
 
@@ -523,6 +630,7 @@ MStatus CreateSceneVisitor::operator()(Alembic::AbcGeom::ISubD& iNode)
 
     std::size_t firstProp = mData.mPropList.size();
     getAnimatedProps(arbProp, mData.mPropList);
+    Alembic::Abc::IScalarProperty visProp = getVisible(iNode, mData.mPropList);
 
     if (mAction == CREATE || mAction == CREATE_REMOVE)
     {
@@ -535,6 +643,8 @@ MStatus CreateSceneVisitor::operator()(Alembic::AbcGeom::ISubD& iNode)
 
         Alembic::Abc::ICompoundProperty arbProp =
             iNode.getSchema().getArbGeomParams();
+
+        setConstantVisibility(visProp, subDObj);
         addProps(arbProp, subDObj);
     }
 
@@ -563,6 +673,7 @@ MStatus CreateSceneVisitor::operator()(Alembic::AbcGeom::ISubD& iNode)
 
         disconnectMesh(subDObj, mData.mPropList, firstProp);
         addToPropList(firstProp, subDObj);
+        addFaceSets(subDObj, iNode);
 
     }
 
@@ -585,6 +696,7 @@ MStatus CreateSceneVisitor::operator()(Alembic::AbcGeom::IPolyMesh& iNode)
 
     std::size_t firstProp = mData.mPropList.size();
     getAnimatedProps(arbProp, mData.mPropList);
+    Alembic::Abc::IScalarProperty visProp = getVisible(iNode, mData.mPropList);
 
     if (mAction == CREATE || mAction == CREATE_REMOVE)
     {
@@ -595,8 +707,10 @@ MStatus CreateSceneVisitor::operator()(Alembic::AbcGeom::IPolyMesh& iNode)
             mData.mPolyMeshObjList.push_back(polyObj);
         }
 
-        addProps(arbProp, polyObj);
+        setConstantVisibility(visProp, polyObj);
 
+        addProps(arbProp, polyObj);
+        addFaceSets(polyObj, iNode);
     }
 
 
@@ -649,6 +763,7 @@ MStatus CreateSceneVisitor::operator()(Alembic::AbcGeom::IXform & iNode)
 
     std::size_t firstProp = mData.mPropList.size();
     getAnimatedProps(arbProp, mData.mPropList);
+    Alembic::Abc::IScalarProperty visProp = getVisible(iNode, mData.mPropList);
 
     // There might be children under the current DAG node that
     // doesn't exist in the file.
@@ -726,6 +841,7 @@ MStatus CreateSceneVisitor::operator()(Alembic::AbcGeom::IXform & iNode)
                     Alembic::Abc::ISampleSelector::kNearIndex)) );
         }
 
+        setConstantVisibility(visProp, transObj);
         addProps(arbProp, transObj);
     }
 

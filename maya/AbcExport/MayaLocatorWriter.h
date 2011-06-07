@@ -1,7 +1,7 @@
 //-*****************************************************************************
 //
 // Copyright (c) 2009-2011,
-//  Sony Pictures Imageworks, Inc. and
+//  Sony Pictures Imageworks Inc. and
 //  Industrial Light & Magic, a division of Lucasfilm Entertainment Company Ltd.
 //
 // All rights reserved.
@@ -16,7 +16,7 @@
 // in the documentation and/or other materials provided with the
 // distribution.
 // *       Neither the name of Sony Pictures Imageworks, nor
-// Industrial Light & Magic nor the names of their contributors may be used
+// Industrial Light & Magic, nor the names of their contributors may be used
 // to endorse or promote products derived from this software without specific
 // prior written permission.
 //
@@ -34,35 +34,38 @@
 //
 //-*****************************************************************************
 
+#ifndef _AlembicExport_MayaLocatorWriter_h_
+#define _AlembicExport_MayaLocatorWriter_h_
 
-#ifndef ABCIMPORT_MESHHELPER_H_
-#define ABCIMPORT_MESHHELPER_H_
+#include "Foundation.h"
+#include "AttributesWriter.h"
+#include "MayaTransformWriter.h"
 
-#include <maya/MFnMesh.h>
-#include <maya/MObject.h>
+#include <Alembic/AbcGeom/OXform.h>
 
-#include <vector>
-#include <string>
+// Writes a locator node as an xform
+class MayaLocatorWriter
+{
+  public:
 
-#include <Alembic/AbcGeom/IPolyMesh.h>
-#include <Alembic/AbcGeom/ISubD.h>
+    MayaLocatorWriter(MDagPath & iDag, Alembic::Abc::OObject & iParent,
+        uint32_t iTimeIndex, bool iWriteVisibility, bool iForceStatic);
 
-#include "NodeIteratorVisitorHelper.h"
+    ~MayaLocatorWriter();
+    void write();
+    bool isAnimated() const;
+    AttributesWriterPtr getAttrs() {return mAttrs;};
 
-void readPoly(double iFrame, MFnMesh & ioMesh, MObject & iParent,
-    Alembic::AbcGeom::IPolyMesh & iNode, bool iInitialized);
+  private:
 
-void readSubD(double iFrame, MFnMesh & ioMesh, MObject & iParent,
-    Alembic::AbcGeom::ISubD & iNode, bool iInitialized);
+    bool    mIsAnimated;
+    MDagPath mDagPath;
 
-MObject createPoly(double iFrame, Alembic::AbcGeom::IPolyMesh & iNode,
-    MObject & iParent);
+    Alembic::Abc::OScalarProperty mSp;
+    Alembic::AbcGeom::OXform mXform;
+    AttributesWriterPtr mAttrs;
+};
 
-MObject createSubD(double iFrame, Alembic::AbcGeom::ISubD & iNode,
-    MObject & iParent);
+typedef boost::shared_ptr < MayaLocatorWriter > MayaLocatorWriterPtr;
 
-void disconnectMesh(MObject & iMeshObject,
-    std::vector<Prop> & iSampledPropList,
-    std::size_t iFirstProp);
-
-#endif  // ABCIMPORT_MESHHELPER_H_
+#endif  // _AlembicExport_MayaLocatorWriter_h_
