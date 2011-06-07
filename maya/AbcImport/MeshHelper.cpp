@@ -478,7 +478,7 @@ void readSubD(double iFrame, MFnMesh & ioMesh, MObject & iParent,
 }
 
 void disconnectMesh(MObject & iMeshObject,
-    std::vector<Alembic::Abc::IArrayProperty> & iSampledPropList,
+    std::vector<Prop> & iSampledPropList,
     std::size_t iFirstProp)
 {
     MFnMesh fnMesh;
@@ -633,6 +633,7 @@ MObject createSubD(double iFrame, Alembic::AbcGeom::ISubD & iNode,
         fnMesh.addAttribute(attrObj,  MFnDependencyNode::kLocalDynamicAttr);
     }
 
+#if MAYA_API_VERSION >= 201100
     Alembic::Abc::Int32ArraySamplePtr holes = samp.getHoles();
     if (holes && !holes->size() == 0)
     {
@@ -650,6 +651,7 @@ MObject createSubD(double iFrame, Alembic::AbcGeom::ISubD & iNode,
             printWarning(warn);
         }
     }
+#endif
 
     Alembic::Abc::FloatArraySamplePtr creases = samp.getCreaseSharpnesses();
     if (creases && !creases->size() == 0)
