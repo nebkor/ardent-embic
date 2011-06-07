@@ -201,6 +201,16 @@ public:
 
     FaceSetExclusivity getFaceExclusivity();
 
+    Abc::IBox3dProperty getSelfBounds()
+    {
+        return m_selfBoundsProperty;
+    }
+
+    Abc::IBox3dProperty getChildBounds()
+    {
+        return m_childBoundsProperty;
+    }
+    
     ICompoundProperty getArbGeomParams() { return m_arbGeomParams; }
 
     //-*************************************************************************

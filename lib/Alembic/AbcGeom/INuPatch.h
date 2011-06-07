@@ -69,16 +69,15 @@ public:
 
         // trim curve
 	uint64_t getTrimNumLoops() const { return m_trimNumLoops; }
-	Abc::UInt64ArraySamplePtr getTrimNumVertices() const { return m_trimNumVertices; }
-	Abc::UInt64ArraySamplePtr getTrimNumCurves() const { return m_trimNumCurves; }
-	Abc::UInt64ArraySamplePtr getTrimOrders() const { return m_trimOrder; }
-	Abc::FloatArraySamplePtr getTrimKnots() const { return m_trimKnot; }
-	Abc::FloatArraySamplePtr getTrimMins() const { return m_trimMin; }
-	Abc::FloatArraySamplePtr getTrimMaxes() const { return m_trimMax; }
-	Abc::FloatArraySamplePtr getTrimU() const { return m_trimU; }
-	Abc::FloatArraySamplePtr getTrimV() const { return m_trimV; }
-	Abc::FloatArraySamplePtr getTrimW() const { return m_trimW; }
-
+        Abc::UInt64ArraySamplePtr getTrimNumVertices() const { return m_trimNumVertices; }
+        Abc::UInt64ArraySamplePtr getTrimNumCurves() const { return m_trimNumCurves; }
+        Abc::UInt64ArraySamplePtr getTrimOrders() const { return m_trimOrder; }
+        Abc::FloatArraySamplePtr getTrimKnots() const { return m_trimKnot; }
+        Abc::FloatArraySamplePtr getTrimMins() const { return m_trimMin; }
+        Abc::FloatArraySamplePtr getTrimMaxes() const { return m_trimMax; }
+        Abc::FloatArraySamplePtr getTrimU() const { return m_trimU; }
+        Abc::FloatArraySamplePtr getTrimV() const { return m_trimV; }
+        Abc::FloatArraySamplePtr getTrimW() const { return m_trimW; }
 
         bool hasTrimCurve() const { return m_trimNumLoops != 0; }
 
@@ -104,14 +103,14 @@ public:
             // trim curve
             m_trimNumLoops = 0;
             m_trimNumCurves.reset();
-	    m_trimNumVertices.reset();
-	    m_trimOrder.reset();
-	    m_trimKnot.reset();
-	    m_trimMin.reset();
-	    m_trimMax.reset();
-	    m_trimU.reset();
-	    m_trimV.reset();
-	    m_trimW.reset();
+            m_trimNumVertices.reset();
+            m_trimOrder.reset();
+            m_trimKnot.reset();
+            m_trimMin.reset();
+            m_trimMax.reset();
+            m_trimU.reset();
+            m_trimV.reset();
+            m_trimW.reset();
         }
 
         ALEMBIC_OPERATOR_BOOL( valid() );
@@ -129,17 +128,17 @@ public:
         Abc::FloatArraySamplePtr m_vKnot;
 
         // trim curve
-	uint64_t m_trimNumLoops;
-	Abc::UInt64ArraySamplePtr m_trimNumCurves;
-	Abc::UInt64ArraySamplePtr m_trimNumVertices;
-	Abc::UInt64ArraySamplePtr m_trimOrder;
-	Abc::FloatArraySamplePtr m_trimKnot;
-	Abc::FloatArraySamplePtr m_trimMin;
-	Abc::FloatArraySamplePtr m_trimMax;
-	Abc::FloatArraySamplePtr m_trimU;
-	Abc::FloatArraySamplePtr m_trimV;
-	Abc::FloatArraySamplePtr m_trimW;
-	bool m_hasTrimCurve;
+        uint64_t m_trimNumLoops;
+        Abc::UInt64ArraySamplePtr m_trimNumCurves;
+        Abc::UInt64ArraySamplePtr m_trimNumVertices;
+        Abc::UInt64ArraySamplePtr m_trimOrder;
+        Abc::FloatArraySamplePtr m_trimKnot;
+        Abc::FloatArraySamplePtr m_trimMin;
+        Abc::FloatArraySamplePtr m_trimMax;
+        Abc::FloatArraySamplePtr m_trimU;
+        Abc::FloatArraySamplePtr m_trimV;
+        Abc::FloatArraySamplePtr m_trimW;
+        bool m_hasTrimCurve;
 
         // bounds
         Abc::Box3d m_selfBounds;
@@ -243,8 +242,12 @@ public:
         return smp;
     }
 
-    Abc::IV3fArrayProperty &getPositions(){ return m_positions; }
-    Abc::IBox3dProperty &getBounds() { return m_selfBounds; }
+    Abc::IV3fArrayProperty getPositions(){ return m_positions; }
+    Abc::IFloatArrayProperty getUKnots(){ return m_uKnot; }
+    Abc::IFloatArrayProperty getVKnots(){ return m_vKnot; }
+
+    Abc::IBox3dProperty getSelfBounds() { return m_selfBounds; }
+    Abc::IBox3dProperty getChildBounds() { return m_childBounds; }
 
     bool hasTrimCurve();
     bool trimCurveTopologyIsHomogenous();
