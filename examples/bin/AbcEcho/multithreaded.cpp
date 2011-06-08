@@ -46,6 +46,9 @@ using namespace ::Alembic::AbcGeom;
 
 static const Abc::V3f g_vec( 1.0, 2.0, 3.0 );
 
+static pthread_t g_threads[2];
+static size_t g_tid;
+
 //-*****************************************************************************
 void *visitSimpleProperty( void* prop )
 {
@@ -55,20 +58,25 @@ void *visitSimpleProperty( void* prop )
     {
         Abc::IV3fArrayProperty p( iProp.getPtr(), kWrapExisting );
 
-        Abc::V3fArraySamplePtr samp = p.getValue();
-
-        if ( samp->size() > 0 && (*samp)[0] == g_vec )
+        for ( size_t i = 0 ; i < p.getNumSamples() ; ++i )
         {
-            std::cout << "That is extremely unlikely!" << std::endl;
-            std::cout << iProp.getObject().getFullName() << std::endl;
+            Abc::V3fArraySamplePtr samp = p.getValue( i );
+
+            for ( size_t j = 0 ; j < samp->size() ; ++j )
+            {
+                if ( (*samp)[j] == g_vec )
+                {
+                    std::cout << "That is extremely unlikely!" << std::endl;
+                    std::cout << iProp.getObject().getFullName() << std::endl;
+                }
+            }
         }
     }
     return NULL;
 }
 
 //-*****************************************************************************
-void visitProperties( ICompoundProperty iParent,
-                      std::vector<pthread_t> &threads, size_t &tid )
+void visitProperties( ICompoundProperty iParent )
 {
     for ( size_t i = 0 ; i < iParent.getNumProperties() ; i++ )
     {
@@ -76,30 +84,49 @@ void visitProperties( ICompoundProperty iParent,
 
         if ( header.isCompound() )
         {
-            visitProperties( ICompoundProperty( iParent, header.getName() ),
-                             threads, tid );
+            visitProperties( ICompoundProperty( iParent, header.getName() ) );
         }
         else if ( header.isArray() )
         {
             IArrayProperty p( iParent, header.getName() );
-            int64_t id = pthread_create( &threads[tid++], NULL,
+
+            #if 1
+            visitSimpleProperty( &p );
+            #else
+            int64_t id = pthread_create( &g_threads[g_tid], NULL,
                                          visitSimpleProperty, &p );
-            std::cout << "spawned thread id " << id << std::endl;
+            ++g_tid;
+
+            if ( g_tid > 1 )
+            {
+                for ( size_t j = 0 ; j < 2 ; ++j )
+                {
+                    pthread_join( g_threads[j], NULL );
+                    std::cout << "joined thread " << g_threads[j] << std::endl;
+                }
+                g_tid = 0;
+            }
+            std::cout << "spawned thread " << g_threads[g_tid] << std::endl;
+            #endif
         }
+    }
+
+    for ( size_t i = 0 ; i < g_tid ; ++i )
+    {
+        pthread_join( g_threads[i], NULL );
     }
 }
 
 //-*****************************************************************************
-void visitObject( IObject iObj, std::vector<pthread_t>& threads, size_t tid )
+void visitObject( IObject iObj )
 {
     ICompoundProperty props = iObj.getProperties();
-    visitProperties( props, threads, tid );
+    visitProperties( props );
 
     // now the child objects
     for ( size_t i = 0 ; i < iObj.getNumChildren() ; i++ )
     {
-        visitObject( IObject( iObj, iObj.getChildHeader( i ).getName() ),
-                     threads, tid );
+        visitObject( IObject( iObj, iObj.getChildHeader( i ).getName() ) );
     }
 }
 
@@ -117,13 +144,15 @@ int main( int argc, char *argv[] )
         exit( -1 );
     }
 
-    std::vector<pthread_t> threads( 50,000 );
+    pthread_t t1, t2;
+    g_threads[0] = t1;
+    g_threads[1] = t2;
 
     // Scoped.
     {
         IArchive archive( Alembic::AbcCoreHDF5::ReadArchive(),
                           argv[1] );
-        visitObject( archive.getTop(), threads, 0 );
+        visitObject( archive.getTop() );
     }
 
     return 0;
