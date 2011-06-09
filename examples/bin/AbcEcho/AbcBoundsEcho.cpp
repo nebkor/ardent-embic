@@ -49,10 +49,14 @@ static Box3d g_bounds;
 //-*****************************************************************************
 void accumXform( M44d &xf, IObject obj )
 {
-    IXform x( obj, kWrapExisting );
-    XformSample xs;
-    x.getSchema().get( xs );
-    xf *= xs.getMatrix();
+    //IObject parent = obj.getParent();
+    if ( IXform::matches( obj.getHeader() ) )
+    {
+        IXform x( obj, kWrapExisting );
+        XformSample xs;
+        x.getSchema().get( xs );
+        xf *= xs.getMatrix();
+    }
 }
 
 //-*****************************************************************************
