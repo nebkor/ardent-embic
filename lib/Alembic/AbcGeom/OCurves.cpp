@@ -75,7 +75,7 @@ void OCurvesSchema::set( const OCurvesSchema::Sample &iSamp )
     if ( iSamp.getUVs() && !m_uvs )
     {
         m_uvs = Abc::OV2fArrayProperty( this->getPtr(), "uv",
-            m_positions.getTimeSampling() );
+                                        m_positions.getTimeSampling() );
 
         Abc::V2fArraySample empty;
 
@@ -235,7 +235,7 @@ void OCurvesSchema::setFromPrevious()
     if ( m_uvs ) { m_uvs.setFromPrevious(); }
     if ( m_normals ) { m_normals.setFromPrevious(); }
     if ( m_widths ) { m_widths.setFromPrevious(); }
-    
+
     ALEMBIC_ABC_SAFE_CALL_END();
 }
 
@@ -254,7 +254,8 @@ void OCurvesSchema::init( const AbcA::index_t iTsIdx )
 
     m_nVertices = Abc::OUInt32ArrayProperty( _this, "nVertices", iTsIdx);
 
-    m_basisAndType = Abc::OScalarProperty( _this, "curveBasisAndType",
+    m_basisAndType = Abc::OScalarProperty(
+        _this, "curveBasisAndType",
         AbcA::DataType( Alembic::Util::kUint8POD, 4 ), iTsIdx );
 
     ALEMBIC_ABC_SAFE_CALL_END_RESET();

@@ -62,7 +62,8 @@ public:
 
         std::size_t getNumCurves() const
         {
-            return m_nVertices->size();
+            if ( m_nVertices ) { return m_nVertices->size(); }
+            else { return 0; }
         }
 
         Abc::UInt32ArraySamplePtr getCurvesNumVertices() const
@@ -111,7 +112,7 @@ public:
         Abc::Box3d m_childBounds;
 
         // type, wrap, and nVertices
-        std::size_t m_numCurves;
+        //std::size_t m_numCurves;
         Abc::UInt32ArraySamplePtr m_nVertices;
 
         CurveType m_type;
@@ -262,7 +263,7 @@ public:
     bool valid() const
     {
         return ( Abc::ISchema<CurvesSchemaInfo>::valid() &&
-                 m_positions.valid() );
+                 m_positions.valid() && m_nVertices.valid() );
     }
 
     //! unspecified-bool-type operator overload.
