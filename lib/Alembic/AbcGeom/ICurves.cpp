@@ -85,7 +85,7 @@ void ICurvesSchema::init( const Abc::Argument &iArg0,
 
     m_basisAndType = Abc::IScalarProperty( _this, "curveBasisAndType",
                                           args.getSchemaInterpMatching());
-    
+
     m_selfBounds = Abc::IBox3dProperty( _this, ".selfBnds", iArg0, iArg1 );
 
     if ( this->getPropertyHeader( ".childBnds" ) != NULL )
@@ -116,7 +116,7 @@ void ICurvesSchema::init( const Abc::Argument &iArg0,
                                                   args.getErrorHandlerPolicy()
                                                 );
     }
-    
+
     ALEMBIC_ABC_SAFE_CALL_END_RESET();
 }
 
@@ -125,6 +125,8 @@ void ICurvesSchema::get( ICurvesSchema::Sample &oSample,
                          const Abc::ISampleSelector &iSS )
 {
     ALEMBIC_ABC_SAFE_CALL_BEGIN( "ICurvesSchema::get()" );
+
+    if ( ! valid() || getNumSamples() < 1 ) { return; }
 
     m_positions.get( oSample.m_positions, iSS );
     m_nVertices.get( oSample.m_nVertices, iSS );

@@ -56,7 +56,7 @@ using namespace Alembic::AbcGeom; // Contains Abc, AbcCoreAbstract
 //-*****************************************************************************
 //-*****************************************************************************
 
-void doSample( OCurves iCurves )
+void doSample( OCurves &iCurves )
 {
 
     OCurvesSchema &curves = iCurves.getSchema();
@@ -67,8 +67,6 @@ void doSample( OCurves iCurves )
     V2fArraySample uvSample( V2fArraySample( (const V2f *)g_uvs,
                                              12));
 
-    std::cout << "original size " << widthSample.size() << std::endl;
-    std::cout << "uz original size " << uvSample.size() << std::endl;
 
     std::cout << "creating sample " << curves.getNumSamples() << std::endl;
     OCurvesSchema::Sample curves_sample(
@@ -160,8 +158,7 @@ int main( int argc, char *argv[] )
 
     std::cout << "wrote curves" << std::endl;
 
-    //Example1_CurvesIn();
+    Example1_CurvesIn();
 
-    //Time_Sampled_Mesh_Test0();
     return 0;
 }
