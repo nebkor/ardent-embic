@@ -56,7 +56,7 @@ using namespace Alembic::AbcGeom; // Contains Abc, AbcCoreAbstract
 //-*****************************************************************************
 //-*****************************************************************************
 
-void doSample( OCurves iCurves )
+void doSample( OCurves &iCurves )
 {
 
     OCurvesSchema &curves = iCurves.getSchema();
@@ -73,9 +73,9 @@ void doSample( OCurves iCurves )
         V3fArraySample( ( const V3f * ) g_verts, g_totalVerts ),
         UInt32ArraySample( g_numVerts, g_numCurves),
         kCubic,
-        kNonPeriodic
-        //widthSample,
-        //uvSample
+        kNonPeriodic,
+        widthSample,
+        uvSample
                                        );
 
     std::cout << "setting sample" << std::endl;
