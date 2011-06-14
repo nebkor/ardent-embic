@@ -126,7 +126,7 @@ void ICurvesSchema::get( ICurvesSchema::Sample &oSample,
 {
     ALEMBIC_ABC_SAFE_CALL_BEGIN( "ICurvesSchema::get()" );
 
-    if ( ! valid() || getNumSamples() < 1 ) { return; }
+    if ( ! valid() ) { return; }
 
     m_positions.get( oSample.m_positions, iSS );
     m_nVertices.get( oSample.m_nVertices, iSS );
