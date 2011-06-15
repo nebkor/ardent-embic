@@ -285,12 +285,12 @@ public:
     //! can be used to override the ErrorHandlerPolicy, to specify
     //! MetaData, and to set TimeSamplingType.
     template <class CPROP_PTR>
-    ONuPatchSchema( CPROP_PTR iParentObject,
+    ONuPatchSchema( CPROP_PTR iParent,
                      const std::string &iName,
                      const Abc::Argument &iArg0 = Abc::Argument(),
                      const Abc::Argument &iArg1 = Abc::Argument(),
                      const Abc::Argument &iArg2 = Abc::Argument() )
-      : Abc::OSchema<NuPatchSchemaInfo>( iParentObject, iName,
+      : Abc::OSchema<NuPatchSchemaInfo>( iParent, iName,
                                             iArg0, iArg1, iArg2 )
     {
 
@@ -304,7 +304,7 @@ public:
 
         if ( tsPtr )
         {
-            tsIndex = iParentObject->getObject()->getArchive()->
+            tsIndex = iParent->getObject()->getArchive()->
                 addTimeSampling( *tsPtr );
         }
 
