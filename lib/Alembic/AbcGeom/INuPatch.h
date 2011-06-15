@@ -176,11 +176,11 @@ public:
     //! can be used to override the ErrorHandlerPolicy and to specify
     //! schema interpretation matching.
     template <class CPROP_PTR>
-    INuPatchSchema( CPROP_PTR iParentObject,
+    INuPatchSchema( CPROP_PTR iParent,
                     const std::string &iName,
                     const Abc::Argument &iArg0 = Abc::Argument(),
                     const Abc::Argument &iArg1 = Abc::Argument() )
-      : Abc::ISchema<NuPatchSchemaInfo>( iParentObject, iName,
+      : Abc::ISchema<NuPatchSchemaInfo>( iParent, iName,
                                          iArg0, iArg1 )
     {
         init( iArg0, iArg1 );
