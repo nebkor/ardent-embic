@@ -62,6 +62,7 @@
 #include "CameraHelper.h"
 #include "MeshHelper.h"
 #include "NurbsCurveHelper.h"
+#include "NurbsSurfaceHelper.h"
 #include "PointHelper.h"
 #include "XformHelper.h"
 
@@ -272,7 +273,7 @@ MStatus AlembicNode::compute(const MPlug & plug, MDataBlock & dataBlock)
         // no caching!
         Alembic::Abc::IArchive archive(Alembic::AbcCoreHDF5::ReadArchive(),
             fileName.asChar(), Alembic::Abc::ErrorHandler::Policy(),
-            Alembic::AbcCoreAbstract::v1::ReadArraySampleCachePtr());
+            Alembic::AbcCoreAbstract::ReadArraySampleCachePtr());
 
         if (!archive.valid())
         {
@@ -294,7 +295,7 @@ MStatus AlembicNode::compute(const MPlug & plug, MDataBlock & dataBlock)
         mSubDInitialized = false;
         mPolyInitialized = false;
 
-        CreateSceneVisitor visitor(inputTime, MObject::kNullObj,
+        CreateSceneVisitor visitor(inputTime, MObject::kNullObj, 
             CreateSceneVisitor::NONE, "");
 
         visitor.walk(archive);
@@ -354,11 +355,9 @@ MStatus AlembicNode::compute(const MPlug & plug, MDataBlock & dataBlock)
                     if (mData.mPropList[i].mScalar.getName() == "visible")
                     {
                         Alembic::Util::int8_t visVal = 1;
-                        mData.mPropList[i].mScalar.get(
-                            &visVal,
-                            Alembic::Abc::ISampleSelector(
-                                mCurTime,
-                                Alembic::Abc::ISampleSelector::kNearIndex ) );
+                        mData.mPropList[i].mScalar.get(&visVal,
+                            Alembic::Abc::ISampleSelector(mCurTime,
+                                Alembic::Abc::ISampleSelector::kNearIndex ));
                         handle.setBool(visVal != 0);
                     }
                 }
@@ -657,7 +656,7 @@ MStatus AlembicNode::compute(const MPlug & plug, MDataBlock & dataBlock)
 
         mOutRead[5] = true;
 
-        unsigned int nSurfaceSize = 0; //mData.mNurbsList.size();
+        unsigned int nSurfaceSize = mData.mNurbsList.size();
 
         if (nSurfaceSize > 0)
         {
@@ -678,7 +677,7 @@ MStatus AlembicNode::compute(const MPlug & plug, MDataBlock & dataBlock)
                 MObject obj = outHandle.data();
                 if (obj.hasFn(MFn::kNurbsSurface))
                 {
-                    //read(mCrame, mData.mNurbsList[j], obj);
+                    readNurbs(mCurTime, mData.mNurbsList[j], obj);
                     outHandle.set(obj);
                 }
             }

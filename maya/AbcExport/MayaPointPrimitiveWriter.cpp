@@ -39,8 +39,8 @@
 
 MayaPointPrimitiveWriter::MayaPointPrimitiveWriter(
     double iFrame, MDagPath & iDag, Alembic::AbcGeom::OObject & iParent,
-    uint32_t iTimeIndex,
-    bool iWriteVisibility, bool iForceStatic) :
+    Alembic::Util::uint32_t iTimeIndex,
+    bool iWriteVisibility) :
     mIsAnimated(false), mDagPath(iDag)
 {
     MFnParticleSystem particle(mDagPath);
@@ -50,10 +50,10 @@ MayaPointPrimitiveWriter::MayaPointPrimitiveWriter(
 
     Alembic::Abc::OCompoundProperty cp = mSchema.getArbGeomParams();
     mAttrs = AttributesWriterPtr(new AttributesWriter(cp, particle,
-        iTimeIndex, iWriteVisibility, iForceStatic));
+        iTimeIndex, iWriteVisibility));
 
     MObject object = iDag.node();
-    if (!iForceStatic && util::isAnimated(object))
+    if (iTimeIndex != 0 && util::isAnimated(object))
         mIsAnimated = true;
 
     write(iFrame);
@@ -63,7 +63,7 @@ void MayaPointPrimitiveWriter::write(double iFrame)
 {
     std::vector<float> position;
     std::vector<float> velocity;
-    std::vector< uint64_t > particleIds;
+    std::vector< Alembic::Util::uint64_t > particleIds;
     std::vector<float> width;
     float constantwidth = -1.0;
 

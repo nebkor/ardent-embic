@@ -34,40 +34,34 @@
 //
 //-*****************************************************************************
 
-#ifndef _AbcExport_MayaCameraWriter_h_
-#define _AbcExport_MayaCameraWriter_h_
+#ifndef _AbcExport_MayaNurbsSurfaceWriter_h_
+#define _AbcExport_MayaNurbsSurfaceWriter_h_
 
 #include "Foundation.h"
 #include "AttributesWriter.h"
 #include "MayaTransformWriter.h"
 
-#include <Alembic/AbcGeom/OCamera.h>
+#include <Alembic/AbcGeom/ONuPatch.h>
 
-// Writes an MFnCamera
-class MayaCameraWriter
+class MayaNurbsSurfaceWriter
 {
   public:
 
-    MayaCameraWriter(MDagPath & iDag, Alembic::Abc::OObject & iParent,
-        Alembic::Util::uint32_t iTimeIndex, bool iWriteVisibility);
-    AttributesWriterPtr getAttrs() {return mAttrs;};
+    MayaNurbsSurfaceWriter(MDagPath & iDag, Alembic::Abc::OObject & iParent,
+        Alembic::Util::uint32_t iTimeIndex, bool iWriteVisibilty);
     void write();
     bool isAnimated() const;
+    unsigned int getNumCVs();
+    AttributesWriterPtr getAttrs() {return mAttrs;};
 
   private:
 
-    bool mIsAnimated;
+    bool mIsSurfaceAnimated;
+    bool mIsTrimCurveAnimated;
     MDagPath mDagPath;
-    bool mUseRenderShutter;
-    double mShutterOpen;
-    double mShutterClose;
-    Alembic::AbcGeom::OCameraSchema mSchema;
-    AttributesWriterPtr mAttrs;
 
-    Alembic::AbcGeom::CameraSample mSamp;
-    MFnCamera::FilmFit mFilmFit;
+    AttributesWriterPtr mAttrs;
+    Alembic::AbcGeom::ONuPatchSchema mSchema;
 };
 
-typedef boost::shared_ptr < MayaCameraWriter > MayaCameraWriterPtr;
-
-#endif  // _AbcExport_MayaCameraWriter_h_
+#endif  // _AbcExport_MayaNurbsSurfaceWriter_h_
