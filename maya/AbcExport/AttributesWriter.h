@@ -49,9 +49,8 @@ class AttributesWriter
     // the initial write at iFrame for sampled data
     AttributesWriter(Alembic::Abc::OCompoundProperty & iParent,
         const MFnDagNode & iNode,
-        uint32_t iTimeIndex,
-        bool iWriteVisibility,
-        bool iForceStatic);
+        Alembic::Util::uint32_t iTimeIndex,
+        bool iWriteVisibility);
 
     ~AttributesWriter();
 

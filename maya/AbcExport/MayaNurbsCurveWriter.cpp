@@ -72,6 +72,7 @@ namespace
                     {
                         continue;
                     }
+
                     // with the flag set to true, check the DagPath and it's
                     // parent
                     if (util::isAnimated(curve, true))
@@ -85,8 +86,8 @@ namespace
 }
 
 MayaNurbsCurveWriter::MayaNurbsCurveWriter(MDagPath & iDag,
-    Alembic::Abc::OObject & iParent, uint32_t iTimeIndex, bool iIsCurveGrp,
-    bool iWriteVisibility, bool iForceStatic) :
+    Alembic::Abc::OObject & iParent, Alembic::Util::uint32_t iTimeIndex,
+    bool iIsCurveGrp, bool iWriteVisibility) :
     mIsAnimated(false), mRootDagPath(iDag), mIsCurveGrp(iIsCurveGrp)
 {
     MStatus stat;
@@ -105,7 +106,7 @@ MayaNurbsCurveWriter::MayaNurbsCurveWriter(MDagPath & iDag,
     {
         MObject curve = iDag.node();
 
-        if (util::isAnimated(curve))
+        if (iTimeIndex != 0 && util::isAnimated(curve))
             mIsAnimated = true;
     }
 
@@ -115,7 +116,7 @@ MayaNurbsCurveWriter::MayaNurbsCurveWriter(MDagPath & iDag,
     Alembic::Abc::OCompoundProperty cp = mSchema.getArbGeomParams();
 
     mAttrs = AttributesWriterPtr(new AttributesWriter(cp, iDag,
-        iTimeIndex, iWriteVisibility, iForceStatic));
+        iTimeIndex, iWriteVisibility));
 
     write();
 }

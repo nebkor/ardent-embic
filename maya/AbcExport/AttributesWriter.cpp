@@ -100,7 +100,7 @@ bool endsWithArbAttr(const std::string & iStr)
 
 void createPropertyFromNumeric(MFnNumericData::Type iType, const MObject& iAttr,
     const MPlug& iPlug, Abc::OCompoundProperty & iParent,
-    uint32_t iTimeIndex,
+    Alembic::Util::uint32_t iTimeIndex,
     AbcGeom::GeometryScope iScope,
     std::vector < PlugAndObjArray > & oArrayVec)
 {
@@ -821,7 +821,7 @@ bool attributeToPropertyPair(const MObject& iAttr, const MPlug& iPlug,
     }
     else if (iAttr.hasFn(MFn::kEnumAttribute))
     {
-        int16_t val = iPlug.asShort();
+        Alembic::Util::int16_t val = iPlug.asShort();
         AbcA::ArraySample samp(&val, oProp.getDataType(),
             Alembic::Util::Dimensions(1));
         oProp.set(samp);
@@ -833,7 +833,7 @@ bool attributeToPropertyPair(const MObject& iAttr, const MPlug& iPlug,
 
 void createPropertyFromMFnAttr(const MObject& iAttr, const MPlug& iPlug,
     Abc::OCompoundProperty & iParent,
-    uint32_t iTimeIndex,
+    Alembic::Util::uint32_t iTimeIndex,
     AbcGeom::GeometryScope iScope,
     std::vector < PlugAndObjArray > & oArrayVec)
 {
@@ -1010,9 +1010,8 @@ std::set<std::string> * AttributesWriter::mAttribs = NULL;
 AttributesWriter::AttributesWriter(
     Abc::OCompoundProperty & iParent,
     const MFnDagNode & iNode,
-    uint32_t iTimeIndex,
-    bool iWriteVisibility,
-    bool iForceStatic)
+    Alembic::Util::uint32_t iTimeIndex,
+    bool iWriteVisibility)
 {
     PlugAndObjScalar visPlug;
 
@@ -1062,13 +1061,7 @@ AttributesWriter::AttributesWriter(
             continue;
         }
 
-        int sampType = 0;
-
-        // if we aren't forcing everything to be static
-        if (!iForceStatic)
-        {
-            sampType = util::getSampledType(plug);
-        }
+        int sampType = util::getSampledType(plug);
 
         MPlug scopePlug = iNode.findPlug(propName + cAttrScope);
         AbcGeom::GeometryScope scope = AbcGeom::kUnknownScope;
@@ -1083,7 +1076,7 @@ AttributesWriter::AttributesWriter(
             // static
             case 0:
             {
-                createPropertyFromMFnAttr(attr, plug, iParent, iTimeIndex,
+                createPropertyFromMFnAttr(attr, plug, iParent, 0,
                     scope, staticPlugObjArrayVec);
             }
             break;
@@ -1154,7 +1147,7 @@ AttributesWriter::AttributesWriter(
             // static visibility 0 case
             case 1:
             {
-                int8_t visVal = 0;
+                Alembic::Util::int8_t visVal = 0;
 
                 Abc::OCharProperty bp(parent, "visible");
                 bp.set(visVal);
@@ -1164,36 +1157,26 @@ AttributesWriter::AttributesWriter(
             // animated visibility 0 case
             case 2:
             {
-                int8_t visVal = 0;
+                Alembic::Util::int8_t visVal = 0;
 
-                if (!iForceStatic)
-                {
-                    Abc::OCharProperty bp(parent, "visible",
-                        iTimeIndex);
-                    bp.set(visVal);
-                    visPlug.prop = bp;
-                    mAnimVisibility = visPlug;
-                }
-                // force static case
-                else
-                {
-                    Abc::OCharProperty bp(parent, "visible");
-                    bp.set(visVal);
-                }
+                Abc::OCharProperty bp(parent, "visible", iTimeIndex);
+                bp.set(visVal);
+                visPlug.prop = bp;
+                mAnimVisibility = visPlug;
             }
             break;
 
             // animated visibility 1 case
             case 3:
             {
-                // dont add if we are forcing static
-                if (!iForceStatic)
+                // dont add if we are forcing static (no frame range specified)
+                if (iTimeIndex == 0)
                 {
                     break;
                 }
 
                 mAnimVisibility = visPlug;
-                int8_t visVal = -1;
+                Alembic::Util::int8_t visVal = -1;
                 Abc::OCharProperty bp(parent, "visible", iTimeIndex);
                 bp.set(visVal);
                 visPlug.prop = bp;
@@ -1243,7 +1226,7 @@ void AttributesWriter::write()
 
     if (!mAnimVisibility.plug.isNull())
     {
-        int8_t visVal = -1;
+        Alembic::Util::int8_t visVal = -1;
         if (!mAnimVisibility.plug.asBool())
         {
             visVal = 0;

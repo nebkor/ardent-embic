@@ -1,7 +1,7 @@
 //-*****************************************************************************
 //
 // Copyright (c) 2009-2011,
-//  Sony Pictures Imageworks Inc. and
+//  Sony Pictures Imageworks, Inc. and
 //  Industrial Light & Magic, a division of Lucasfilm Entertainment Company Ltd.
 //
 // All rights reserved.
@@ -16,7 +16,7 @@
 // in the documentation and/or other materials provided with the
 // distribution.
 // *       Neither the name of Sony Pictures Imageworks, nor
-// Industrial Light & Magic, nor the names of their contributors may be used
+// Industrial Light & Magic nor the names of their contributors may be used
 // to endorse or promote products derived from this software without specific
 // prior written permission.
 //
@@ -34,40 +34,21 @@
 //
 //-*****************************************************************************
 
-#ifndef _AbcExport_MayaCameraWriter_h_
-#define _AbcExport_MayaCameraWriter_h_
 
-#include "Foundation.h"
-#include "AttributesWriter.h"
-#include "MayaTransformWriter.h"
+#ifndef ABCIMPORT_NURBSSURFACEHELPER_H_
+#define ABCIMPORT_NURBSSURFACEHELPER_H_
 
-#include <Alembic/AbcGeom/OCamera.h>
+#include <maya/MObject.h>
 
-// Writes an MFnCamera
-class MayaCameraWriter
-{
-  public:
+#include <vector>
 
-    MayaCameraWriter(MDagPath & iDag, Alembic::Abc::OObject & iParent,
-        Alembic::Util::uint32_t iTimeIndex, bool iWriteVisibility);
-    AttributesWriterPtr getAttrs() {return mAttrs;};
-    void write();
-    bool isAnimated() const;
+#include <Alembic/AbcGeom/INuPatch.h>
 
-  private:
+MObject createNurbs(double iFrame, Alembic::AbcGeom::INuPatch & iNode,
+    MObject & iParent);
 
-    bool mIsAnimated;
-    MDagPath mDagPath;
-    bool mUseRenderShutter;
-    double mShutterOpen;
-    double mShutterClose;
-    Alembic::AbcGeom::OCameraSchema mSchema;
-    AttributesWriterPtr mAttrs;
+MObject readNurbs(double iFrame, Alembic::AbcGeom::INuPatch & iNode,
+    MObject & iObject);
 
-    Alembic::AbcGeom::CameraSample mSamp;
-    MFnCamera::FilmFit mFilmFit;
-};
+#endif  // ABCIMPORT_NURBSSURFACEHELPER_H_
 
-typedef boost::shared_ptr < MayaCameraWriter > MayaCameraWriterPtr;
-
-#endif  // _AbcExport_MayaCameraWriter_h_
