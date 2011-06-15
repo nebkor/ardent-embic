@@ -123,14 +123,14 @@ MeshTopologyVariance INuPatchSchema::getTopologyVariance()
 bool INuPatchSchema::hasTrimProps()
 {
     return this->getPropertyHeader( "trim_nloops" ) != NULL &&
-           this->getPropertyHeader( "trim_n" ) != NULL &&
-           this->getPropertyHeader( "trim_order" ) != NULL &&
-           this->getPropertyHeader( "trim_knot" ) != NULL &&
-           this->getPropertyHeader( "trim_min" ) != NULL &&
-           this->getPropertyHeader( "trim_max" ) != NULL &&
-           this->getPropertyHeader( "trim_u" ) != NULL &&
-           this->getPropertyHeader( "trim_v" ) != NULL &&
-           this->getPropertyHeader( "trim_w" ) != NULL;
+        this->getPropertyHeader( "trim_n" ) != NULL &&
+        this->getPropertyHeader( "trim_order" ) != NULL &&
+        this->getPropertyHeader( "trim_knot" ) != NULL &&
+        this->getPropertyHeader( "trim_min" ) != NULL &&
+        this->getPropertyHeader( "trim_max" ) != NULL &&
+        this->getPropertyHeader( "trim_u" ) != NULL &&
+        this->getPropertyHeader( "trim_v" ) != NULL &&
+        this->getPropertyHeader( "trim_w" ) != NULL;
 }
 
 //-*****************************************************************************
@@ -160,7 +160,6 @@ void INuPatchSchema::get( sample_type &oSample,
     // handle trim curves
     if ( this->hasTrimCurve() )
     {
-        std::cout << "I got your trimcurve" << std::endl;
         m_trimNumLoops.get( oSample.m_trimNumLoops, iSS );
         m_trimNumCurves.get( oSample.m_trimNumCurves, iSS );
         m_trimNumVertices.get( oSample.m_trimNumVertices, iSS );
@@ -179,7 +178,7 @@ void INuPatchSchema::get( sample_type &oSample,
 
 //-*****************************************************************************
 void INuPatchSchema::init( const Abc::Argument &iArg0,
-                            const Abc::Argument &iArg1 )
+                           const Abc::Argument &iArg1 )
 {
     ALEMBIC_ABC_SAFE_CALL_BEGIN( "ICurvesTrait::init()" );
 
@@ -196,22 +195,22 @@ void INuPatchSchema::init( const Abc::Argument &iArg0,
                                           args.getSchemaInterpMatching() );
 
     m_numU = Abc::IInt32Property( _this, "nu",
-                                args.getSchemaInterpMatching() );
+                                  args.getSchemaInterpMatching() );
 
     m_numV = Abc::IInt32Property( _this, "nv",
-                                args.getSchemaInterpMatching() );
+                                  args.getSchemaInterpMatching() );
 
     m_uOrder = Abc::IInt32Property( _this, "uOrder",
-                                args.getSchemaInterpMatching() );
+                                    args.getSchemaInterpMatching() );
 
     m_vOrder = Abc::IInt32Property( _this, "vOrder",
-                                args.getSchemaInterpMatching() );
+                                    args.getSchemaInterpMatching() );
 
     m_uKnot = Abc::IFloatArrayProperty( _this, "uKnot",
-                                args.getSchemaInterpMatching() );
+                                        args.getSchemaInterpMatching() );
 
     m_vKnot = Abc::IFloatArrayProperty( _this, "vKnot",
-                                args.getSchemaInterpMatching() );
+                                        args.getSchemaInterpMatching() );
 
     // optional properties
     if ( this->getPropertyHeader( ".selfBnds" ) != NULL )
@@ -247,24 +246,26 @@ void INuPatchSchema::init( const Abc::Argument &iArg0,
     {
         m_trimNumLoops = Abc::IInt32Property( _this, "trim_nloops",
                                               args.getErrorHandlerPolicy() );
-        m_trimNumCurves = Abc::IInt32ArrayProperty( _this, "trim_ncurves",
-                                                   args.getErrorHandlerPolicy() );
-        m_trimNumVertices = Abc::IInt32ArrayProperty( _this, "trim_n",
-                                             args.getErrorHandlerPolicy() );
+        m_trimNumCurves = Abc::IInt32ArrayProperty(
+            _this, "trim_ncurves",
+            args.getErrorHandlerPolicy() );
+        m_trimNumVertices = Abc::IInt32ArrayProperty(
+            _this, "trim_n",
+            args.getErrorHandlerPolicy() );
         m_trimOrder = Abc::IInt32ArrayProperty( _this, "trim_order",
-                                                 args.getErrorHandlerPolicy() );
-        m_trimKnot = Abc::IFloatArrayProperty( _this, "trim_knot",
                                                 args.getErrorHandlerPolicy() );
+        m_trimKnot = Abc::IFloatArrayProperty( _this, "trim_knot",
+                                               args.getErrorHandlerPolicy() );
         m_trimMin = Abc::IFloatArrayProperty( _this, "trim_min",
-                                               args.getErrorHandlerPolicy() );
+                                              args.getErrorHandlerPolicy() );
         m_trimMax = Abc::IFloatArrayProperty( _this, "trim_max",
-                                               args.getErrorHandlerPolicy() );
+                                              args.getErrorHandlerPolicy() );
         m_trimU = Abc::IFloatArrayProperty( _this, "trim_u",
-                                             args.getErrorHandlerPolicy() );
+                                            args.getErrorHandlerPolicy() );
         m_trimV = Abc::IFloatArrayProperty( _this, "trim_v",
-                                             args.getErrorHandlerPolicy() );
+                                            args.getErrorHandlerPolicy() );
         m_trimW = Abc::IFloatArrayProperty( _this, "trim_w",
-                                             args.getErrorHandlerPolicy() );
+                                            args.getErrorHandlerPolicy() );
 
         m_hasTrimCurve = m_trimNumLoops.getNumSamples() > 0;
     }
