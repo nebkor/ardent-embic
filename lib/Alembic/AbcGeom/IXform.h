@@ -161,6 +161,8 @@ public:
         return ( super_type::valid() );
     }
 
+    ICompoundProperty getArbGeomParams() { return m_arbGeomParams; }
+
     //! unspecified-bool-type operator overload.
     //! ...
     ALEMBIC_OVERRIDE_OPERATOR_BOOL( this_type::valid() );
@@ -172,6 +174,8 @@ protected:
     AbcA::BasePropertyReaderPtr m_vals;
 
     Abc::IBoolProperty m_inherits;
+
+    Abc::ICompoundProperty m_arbGeomParams;
 
     bool m_isConstant;
 
