@@ -169,10 +169,13 @@ public:
             m_hasTrimCurve = true;
         }
 
-        const uint64_t &getTrimNumLoops() const { return m_trimNumLoops; }
-        const Abc::UInt64ArraySample &getTrimNumCurves() const { return m_trimNumCurves; }
-        const Abc::UInt64ArraySample &getTrimNumVertices() const { return m_trimNumVertices; }
-        const Abc::UInt64ArraySample &getTrimOrder() const { return m_trimOrder; }
+        const uint64_t getTrimNumLoops() const { return m_trimNumLoops; }
+        const Abc::UInt64ArraySample &getTrimNumCurves() const
+        { return m_trimNumCurves; }
+        const Abc::UInt64ArraySample &getTrimNumVertices() const
+        { return m_trimNumVertices; }
+        const Abc::UInt64ArraySample &getTrimOrder() const
+        { return m_trimOrder; }
         const Abc::FloatArraySample &getTrimKnot() const { return m_trimKnot; }
         const Abc::FloatArraySample &getTrimMin() const { return m_trimMin; }
         const Abc::FloatArraySample &getTrimMax() const { return m_trimMax; }
@@ -180,16 +183,19 @@ public:
         const Abc::FloatArraySample &getTrimV() const { return m_trimV; }
         const Abc::FloatArraySample &getTrimW() const { return m_trimW; }
 
-        const bool hasTrimCurve() const { return m_trimNumLoops &&
-                                            m_trimNumCurves &&
-                                            m_trimNumVertices &&
-                                            m_trimOrder &&
-                                            m_trimKnot &&
-                                            m_trimMin &&
-                                            m_trimMax &&
-                                            m_trimU &&
-                                            m_trimV &&
-                                            m_trimW; }
+        const bool hasTrimCurve() const
+        {
+            return m_trimNumLoops > 0 &&
+                m_trimNumCurves &&
+                m_trimNumVertices &&
+                m_trimOrder &&
+                m_trimKnot &&
+                m_trimMin &&
+                m_trimMax &&
+                m_trimU &&
+                m_trimV &&
+                m_trimW;
+        }
 
         void reset()
         {

@@ -60,23 +60,9 @@
 #include <Alembic/AbcGeom/All.h>
 #include <Alembic/AbcCoreHDF5/All.h>
 
-// Other includes
-#include <iostream>
-#include <stdio.h>
-#include <stdlib.h>
-
 #include <Alembic/AbcGeom/Tests/NurbsData.h>
 
 #include "Assert.h"
-
-//-*****************************************************************************
-//-*****************************************************************************
-// NAMESPACES
-//
-// Each library has a namespace which is the same as the name of the library.
-// We shorten those here for brevity.
-//-*****************************************************************************
-//-*****************************************************************************
 
 using namespace std;
 using namespace Alembic::AbcGeom;
@@ -84,6 +70,7 @@ using namespace Alembic::AbcGeom;
 using Alembic::Util::uint64_t;
 using Alembic::Util::float32_t;
 
+#if 1
 void Example1_NurbsOut()
 {
     // Create an OArchive.
@@ -94,16 +81,12 @@ void Example1_NurbsOut()
     // manipulation framework).
     OArchive archive(
 
-        // The hard link to the implementation.
         Alembic::AbcCoreHDF5::WriteArchive(),
 
-        // The file name.
-        // Because we're an OArchive, this is creating (or clobbering)
-        // the archive with this filename.
         "nurbs1.abc" );
 
-    ONuPatch myNurbs(   OObject( archive, kTop ),
-                        "nurbs_surface");
+    ONuPatch myNurbs( OObject( archive, kTop ),
+                      "nurbs_surface" );
 
     ONuPatchSchema &myNurbsSchema = myNurbs.getSchema();
 
@@ -171,6 +154,39 @@ void Example1_NurbsIn()
     TESTING_ASSERT( nurbsSample.getTrimOrders() -> size() == 1 );
     TESTING_ASSERT( nurbsSample.hasTrimCurve() == true );
 }
+#endif
+
+void out2()
+{
+    std::string filename( "nupatch.abc" );
+
+    OArchive archive( Alembic::AbcCoreHDF5::WriteArchive(), filename );
+
+    ONuPatch onurbs( archive.getTop(), "nupatch" );
+
+    Alembic::AbcGeom::ONuPatchSchema &schema = onurbs.getSchema();
+
+
+    V3fArraySample pSample( (const Imath::V3f *)g_P, g_nP );
+    FloatArraySample uKnotSample( (const float32_t *)g_uKnot, 8 );
+    FloatArraySample vKnotSample( (const float32_t *)g_vKnot, 8 );
+
+
+    std::cout << "creating sample" << std::endl;
+    ONuPatchSchema::Sample sample( pSample,
+                                   g_nu,
+                                   g_nv,
+                                   g_uOrder,
+                                   g_vOrder,
+                                   uKnotSample,
+                                   vKnotSample
+                                 );
+
+    std::cout << "about to set" << std::endl;
+    schema.set( sample );
+
+    std::cout << "leaving func" << std::endl;
+}
 
 
 
@@ -187,15 +203,17 @@ void Example1_NurbsIn()
 int main( int argc, char *argv[] )
 {
 
-    std::cout << "writing nurbs" << std::endl;
+    //std::cout << "writing nurbs" << std::endl;
 
     // Nurbs Out
-    Example1_NurbsOut();
-    std::cout << "done writing nurbs" << std::endl;
+    //Example1_NurbsOut();
+    //std::cout << "done writing nurbs" << std::endl;
 
-    std::cout << "reading nurbs" << std::endl;
-    Example1_NurbsIn();
-    std::cout << "done reading nurbs" << std::endl;
+    //std::cout << "reading nurbs" << std::endl;
+    //Example1_NurbsIn();
+    //std::cout << "done reading nurbs" << std::endl;
+
+    out2();
 
     return 0;
 }
