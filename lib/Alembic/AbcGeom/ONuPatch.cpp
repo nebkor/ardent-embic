@@ -106,17 +106,19 @@ void ONuPatchSchema::set( const ONuPatchSchema::Sample &iSamp  )
             m_normals.set( iSamp.getNormals() );
         }
 
-        m_trimNumLoops.set( iSamp.getTrimNumLoops() );
-
-        m_trimNumCurves.set( iSamp.getTrimNumCurves() );
-        m_trimNumVertices.set( iSamp.getTrimNumVertices() );
-        m_trimOrder.set( iSamp.getTrimOrder() );
-        m_trimKnot.set( iSamp.getTrimKnot() );
-        m_trimMin.set( iSamp.getTrimMin() );
-        m_trimMax.set( iSamp.getTrimMax() );
-        m_trimU.set( iSamp.getTrimU() );
-        m_trimV.set( iSamp.getTrimV() );
-        m_trimW.set( iSamp.getTrimW() );
+        if ( iSamp.hasTrimCurve() )
+        {
+            m_trimNumLoops.set( iSamp.getTrimNumLoops() );
+            m_trimNumCurves.set( iSamp.getTrimNumCurves() );
+            m_trimNumVertices.set( iSamp.getTrimNumVertices() );
+            m_trimOrder.set( iSamp.getTrimOrder() );
+            m_trimKnot.set( iSamp.getTrimKnot() );
+            m_trimMin.set( iSamp.getTrimMin() );
+            m_trimMax.set( iSamp.getTrimMax() );
+            m_trimU.set( iSamp.getTrimU() );
+            m_trimV.set( iSamp.getTrimV() );
+            m_trimW.set( iSamp.getTrimW() );
+        }
 
         // set bounds
         if ( iSamp.getChildBounds().hasVolume() )
@@ -252,7 +254,7 @@ void ONuPatchSchema::setFromPrevious( )
     // handle option properties
     if ( m_uvs ) { m_uvs.setFromPrevious(); }
     if ( m_normals ) { m_normals.setFromPrevious(); }
-    
+
     // handle trim curves.
     m_trimNumLoops.setFromPrevious();
     m_trimNumCurves.setFromPrevious();
@@ -264,7 +266,7 @@ void ONuPatchSchema::setFromPrevious( )
     m_trimU.setFromPrevious();
     m_trimV.setFromPrevious();
     m_trimW.setFromPrevious();
-    
+
     ALEMBIC_ABC_SAFE_CALL_END();
 }
 
