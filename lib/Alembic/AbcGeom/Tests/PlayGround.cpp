@@ -167,9 +167,30 @@ void PolyMorphicAbstractPtrs()
 }
 
 //-*****************************************************************************
+void StupidData()
+{
+    OArchive archive( Alembic::AbcCoreHDF5::WriteArchive(), "stupiddata.abc" );
+
+    OObject myobject( archive.getTop(), "myobject" );
+
+    // a compound property to use as the parent for data-containing properties
+    OCompoundProperty props = myobject.getProperties();
+
+    OInt32ArrayProperty intArrayProp( props, "intArrayProp" );
+
+    for ( int32_t i = 0 ; i < 10 ; ++i )
+    {
+        std::vector<int32_t> v( i, i );
+        intArrayProp.set( v );
+        assert( intArrayProp.getNumSamples() == i + 1 );
+    }
+}
+
+//-*****************************************************************************
 int main( int, char** )
 {
     //OWrapExisting();
     PolyMorphicAbstractPtrs();
+    StupidData();
     return 0;
 }
