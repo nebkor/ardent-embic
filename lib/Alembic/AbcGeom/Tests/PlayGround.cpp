@@ -210,6 +210,15 @@ void StupidData()
 
         TESTING_ASSERT( intArrayProp.getNumSamples() == 10 );
 
+        // try to create a non-existent property
+        IFloatArrayProperty nonProp( props, "doesntexist",
+                                     ErrorHandler::kQuietNoopPolicy );
+
+        if ( nonProp )
+        { std::cout << "this should not be printed" << std::endl; }
+        else
+        { std::cout << "non-existent Property doesn't exist." << std::endl; }
+
         for ( int32_t i = 0 ; i < 10 ; ++i )
         {
             std::vector<int32_t> v( i, i );
