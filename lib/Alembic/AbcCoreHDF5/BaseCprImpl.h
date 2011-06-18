@@ -51,7 +51,7 @@ public:
     // For construction from an object reader
     BaseCprImpl( hid_t iParentGroup,
                  const std::string &iName );
-    
+
 public:
     virtual ~BaseCprImpl();
 
@@ -68,20 +68,20 @@ public:
 
     virtual AbcA::ScalarPropertyReaderPtr
     getScalarProperty( const std::string &iName );
-    
+
     virtual AbcA::ArrayPropertyReaderPtr
     getArrayProperty( const std::string &iName );
-    
+
     virtual AbcA::CompoundPropertyReaderPtr
     getCompoundProperty( const std::string &iName );
 
 protected:
     // My Object
     AbcA::ObjectReaderPtr m_object;
-    
+
     // My group.
     hid_t m_group;
-    
+
     // Property Headers and Made Property Pointers.
     struct SubProperty
     {
@@ -107,8 +107,9 @@ protected:
     SubPropertiesMap m_subProperties;
 private:
     // We aren't copyable
-    BaseCprImpl( const BaseCprImpl & input);
-    const BaseCprImpl & operator=(const BaseCprImpl & rhs);
+    BaseCprImpl();
+    BaseCprImpl( const BaseCprImpl &input );
+    const BaseCprImpl& operator=( const BaseCprImpl &rhs );
 };
 
 } // End namespace ALEMBIC_VERSION_NS

@@ -119,6 +119,7 @@ herr_t CprVisitAllAttrsCB( hid_t iGroup,
 BaseCprImpl::BaseCprImpl( hid_t iParentGroup,
                           const std::string &iName )
   : m_group( -1 )
+  , m_subPropertyMutexes( NULL )
 {
     ABCA_ASSERT( iParentGroup >= 0, "invalid parent group" );
 
