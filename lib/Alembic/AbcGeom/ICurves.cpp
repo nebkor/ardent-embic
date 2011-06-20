@@ -69,7 +69,7 @@ MeshTopologyVariance ICurvesSchema::getTopologyVariance()
 void ICurvesSchema::init( const Abc::Argument &iArg0,
                           const Abc::Argument &iArg1 )
 {
-    ALEMBIC_ABC_SAFE_CALL_BEGIN( "ICurvesTrait::init()" );
+    ALEMBIC_ABC_SAFE_CALL_BEGIN( "ICurvesSchema::init()" );
 
     Abc::Arguments args;
     iArg0.setInto( args );
