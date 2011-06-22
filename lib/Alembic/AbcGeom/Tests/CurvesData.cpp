@@ -79,3 +79,5 @@ const float32_t g_widths[] = {    // first curve
     // second curve
     1.0, 1.0
 };
+
+const size_t g_numWidths = 4;

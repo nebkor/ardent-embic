@@ -62,11 +62,11 @@ void doSample( OCurves &iCurves )
     OCurvesSchema &curves = iCurves.getSchema();
 
     OFloatGeomParam::Sample widthSample(
-        FloatArraySample( (const float *)g_widths, 4 ),
+        FloatArraySample( (const float *)g_widths, g_numWidths ),
         kVertexScope );
 
     OV2fGeomParam::Sample uvSample(
-        V2fArraySample( (const V2f *)g_uvs, 12 ),
+        V2fArraySample( (const V2f *)g_uvs, g_totalVerts ),
         kVertexScope );
 
 
