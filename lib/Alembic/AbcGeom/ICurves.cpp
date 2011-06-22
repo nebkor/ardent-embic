@@ -97,17 +97,17 @@ void ICurvesSchema::init( const Abc::Argument &iArg0,
     // none of the things below here are guaranteed to exist
     if ( this->getPropertyHeader( "uv" ) != NULL )
     {
-        m_uvs = Abc::IV2fArrayProperty( _this, "uv", iArg0, iArg1 );
+        m_uvs = IV2fGeomParam( _this, "uv", iArg0, iArg1 );
     }
 
     if ( this->getPropertyHeader( "N" ) != NULL )
     {
-        m_normals = Abc::IV3fArrayProperty( _this, "N", iArg0, iArg1 );
+        m_normals = IN3fGeomParam( _this, "N", iArg0, iArg1 );
     }
 
     if ( this->getPropertyHeader( "width" ) != NULL )
     {
-        m_widths = Abc::IFloatArrayProperty( _this, "width", iArg0, iArg1 );
+        m_widths = IFloatGeomParam( _this, "width", iArg0, iArg1 );
     }
 
     if ( this->getPropertyHeader( ".arbGeomParams" ) != NULL )
@@ -138,21 +138,6 @@ void ICurvesSchema::get( ICurvesSchema::Sample &oSample,
     oSample.m_wrap = static_cast<CurvePeriodicity>( basisAndType[1] );
     oSample.m_basis = static_cast<BasisType>( basisAndType[2] );
     // we ignore basisAndType[3] since it is the same as basisAndType[2]
-
-    if ( m_normals )
-    {
-        m_normals.get( oSample.m_normals, iSS);
-    }
-
-    if ( m_uvs )
-    {
-        m_uvs.get( oSample.m_uvs, iSS);
-    }
-
-    if ( m_widths )
-    {
-        m_widths.get( oSample.m_widths, iSS);
-    }
 
     if ( m_selfBounds )
     {

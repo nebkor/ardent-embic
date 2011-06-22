@@ -61,11 +61,13 @@ void doSample( OCurves &iCurves )
 
     OCurvesSchema &curves = iCurves.getSchema();
 
-    FloatArraySample widthSample( FloatArraySample( (const float *)g_widths,
-                                                    4));
+    OFloatGeomParam::Sample widthSample(
+        FloatArraySample( (const float *)g_widths, 4 ),
+        kVertexScope );
 
-    V2fArraySample uvSample( V2fArraySample( (const V2f *)g_uvs,
-                                             12));
+    OV2fGeomParam::Sample uvSample(
+        V2fArraySample( (const V2f *)g_uvs, 12 ),
+        kVertexScope );
 
 
     std::cout << "creating sample " << curves.getNumSamples() << std::endl;
