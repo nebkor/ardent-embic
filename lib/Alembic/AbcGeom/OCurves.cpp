@@ -252,7 +252,7 @@ void OCurvesSchema::init( const AbcA::index_t iTsIdx )
     m_positions = Abc::OV3fArrayProperty( _this, "P", mdata, iTsIdx );
     m_selfBounds = Abc::OBox3dProperty( _this, ".selfBnds", iTsIdx );
 
-    m_nVertices = Abc::OUInt32ArrayProperty( _this, "nVertices", iTsIdx);
+    m_nVertices = Abc::OInt32ArrayProperty( _this, "nVertices", iTsIdx);
 
     m_basisAndType = Abc::OScalarProperty(
         _this, "curveBasisAndType",
