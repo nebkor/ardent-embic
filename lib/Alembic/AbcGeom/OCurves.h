@@ -41,6 +41,7 @@
 #include <Alembic/AbcGeom/Basis.h>
 #include <Alembic/AbcGeom/CurveType.h>
 #include <Alembic/AbcGeom/SchemaInfoDeclarations.h>
+#include <Alembic/AbcGeom/OGeomParam.h>
 
 namespace Alembic {
 namespace AbcGeom {
@@ -101,9 +102,10 @@ public:
                 const Abc::Int32ArraySample &iNVertices,
                 const CurveType &iType = kCubic,
                 const CurvePeriodicity iWrap = kNonPeriodic,
-                const Abc::FloatArraySample &iWidths = Abc::FloatArraySample(),
-                const Abc::V2fArraySample &iUVs = Abc::V2fArraySample(),
-                const Abc::V3fArraySample &iNormals = Abc::V3fArraySample(),
+                const OFloatGeomParam::Sample &iWidths = \
+                OFloatGeomParam::Sample(),
+                const OV2fGeomParam::Sample &iUVs = OV2fGeomParam::Sample(),
+                const ON3fGeomParam::Sample &iNormals = ON3fGeomParam::Sample(),
                 const BasisType &iBasis = kBezierBasis )
           : m_positions( iPos ),
             m_nVertices( iNVertices ),
@@ -115,8 +117,8 @@ public:
             m_basis( iBasis ) {}
 
         // widths accessor
-        const Abc::FloatArraySample &getWidths() const { return m_widths; }
-        void setWidths( const Abc::FloatArraySample &iWidths )
+        const OFloatGeomParam::Sample &getWidths() const { return m_widths; }
+        void setWidths( const OFloatGeomParam::Sample &iWidths )
         { m_widths = iWidths; }
 
         // positions accessor
@@ -143,11 +145,9 @@ public:
         const Abc::Int32ArraySample &getCurvesNumVertices() const
         { return m_nVertices; }
 
-        // getUVs getter
-        const Abc::V2fArraySample &getUVs() const { return m_uvs; }
-
-        // setUvs setter
-        void setUVs( const Abc::V2fArraySample &iUVs )
+        // UVs
+        const OV2fGeomParam::Sample &getUVs() const { return m_uvs; }
+        void setUVs( const OV2fGeomParam::Sample &iUVs )
         { m_uvs = iUVs; }
 
         // bounding box accessors
@@ -160,8 +160,8 @@ public:
         { m_childBounds = iBnds; }
 
         // normal accessors
-        const Abc::V3fArraySample &getNormals() const { return m_normals; }
-        void setNormals( const Abc::V3fArraySample &iNormals )
+        const ON3fGeomParam::Sample &getNormals() const { return m_normals; }
+        void setNormals( const ON3fGeomParam::Sample &iNormals )
         { m_normals = iNormals; }
 
         // basis accessors
@@ -195,9 +195,9 @@ public:
         CurveType m_type;
         CurvePeriodicity m_wrap;
 
-        Abc::FloatArraySample m_widths;
-        Abc::V2fArraySample m_uvs;
-        Abc::V3fArraySample m_normals;
+        OFloatGeomParam::Sample m_widths;
+        OV2fGeomParam::Sample m_uvs;
+        ON3fGeomParam::Sample m_normals;
 
         BasisType m_basis;
 
@@ -365,9 +365,9 @@ protected:
     Abc::OInt32ArrayProperty m_nVertices;
 
     // per-point data
-    Abc::OV2fArrayProperty m_uvs;
-    Abc::OV3fArrayProperty m_normals;
-    Abc::OFloatArrayProperty m_widths;
+    OV2fGeomParam m_uvs;
+    ON3fGeomParam m_normals;
+    OFloatGeomParam m_widths;
 
     Abc::OCompoundProperty m_arbGeomParams;
 
