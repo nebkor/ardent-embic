@@ -98,7 +98,7 @@ public:
         //! be full like this, which would indicate a change of topology
         Sample(
                 const Abc::V3fArraySample &iPos,
-                const Abc::UInt32ArraySample &iNVertices,
+                const Abc::Int32ArraySample &iNVertices,
                 const CurveType &iType = kCubic,
                 const CurvePeriodicity iWrap = kNonPeriodic,
                 const Abc::FloatArraySample &iWidths = Abc::FloatArraySample(),
@@ -138,9 +138,9 @@ public:
 
         //! an array of ints that corresponds to the number
         //! of vertices per curve
-        void setCurvesNumVertices( const Abc::UInt32ArraySample &iNVertices)
+        void setCurvesNumVertices( const Abc::Int32ArraySample &iNVertices)
         { m_nVertices = iNVertices; }
-        const Abc::UInt32ArraySample &getCurvesNumVertices() const
+        const Abc::Int32ArraySample &getCurvesNumVertices() const
         { return m_nVertices; }
 
         // getUVs getter
@@ -190,7 +190,7 @@ public:
 
         // properties
         Abc::V3fArraySample m_positions;
-        Abc::UInt32ArraySample m_nVertices;
+        Abc::Int32ArraySample m_nVertices;
 
         CurveType m_type;
         CurvePeriodicity m_wrap;
@@ -362,7 +362,7 @@ protected:
 
     // point data
     Abc::OV3fArrayProperty m_positions;
-    Abc::OUInt32ArrayProperty m_nVertices;
+    Abc::OInt32ArrayProperty m_nVertices;
 
     // per-point data
     Abc::OV2fArrayProperty m_uvs;

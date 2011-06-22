@@ -66,7 +66,7 @@ public:
             else { return 0; }
         }
 
-        Abc::UInt32ArraySamplePtr getCurvesNumVertices() const
+        Abc::Int32ArraySamplePtr getCurvesNumVertices() const
         { return m_nVertices; }
 
         CurveType getType() const { return m_type; }
@@ -113,7 +113,7 @@ public:
 
         // type, wrap, and nVertices
         //std::size_t m_numCurves;
-        Abc::UInt32ArraySamplePtr m_nVertices;
+        Abc::Int32ArraySamplePtr m_nVertices;
 
         CurveType m_type;
         BasisType m_basis;
@@ -274,7 +274,7 @@ protected:
     void init( const Abc::Argument &iArg0, const Abc::Argument &iArg1 );
 
     Abc::IV3fArrayProperty m_positions;
-    Abc::IUInt32ArrayProperty  m_nVertices;
+    Abc::IInt32ArrayProperty  m_nVertices;
 
     // contains type, wrap, ubasis, and vbasis.
     Abc::IScalarProperty m_basisAndType;

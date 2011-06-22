@@ -71,7 +71,7 @@ void doSample( OCurves &iCurves )
     std::cout << "creating sample " << curves.getNumSamples() << std::endl;
     OCurvesSchema::Sample curves_sample(
         V3fArraySample( ( const V3f * ) g_verts, g_totalVerts ),
-        UInt32ArraySample( g_numVerts, g_numCurves),
+        Int32ArraySample( g_numVerts, g_numCurves),
         kCubic,
         kNonPeriodic,
         widthSample,
