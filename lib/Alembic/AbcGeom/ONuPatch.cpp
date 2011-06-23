@@ -209,6 +209,16 @@ void ONuPatchSchema::set( const ONuPatchSchema::Sample &iSamp  )
             m_trimW.set( iSamp.getTrimW() );
         }
 
+        if ( m_uvs )
+        {
+            m_uvs.set( iSamp.getUVs() );
+        }
+
+        if ( m_normals )
+        {
+            m_normals.set( iSamp.getNormals() );
+        }
+
         // set bounds
         if ( iSamp.getChildBounds().hasVolume() )
         { m_childBounds.set( iSamp.getChildBounds() ); }
