@@ -210,7 +210,7 @@ public:
     {
         return m_childBoundsProperty;
     }
-    
+
     ICompoundProperty getArbGeomParams() { return m_arbGeomParams; }
 
     //-*************************************************************************
