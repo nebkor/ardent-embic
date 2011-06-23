@@ -104,7 +104,6 @@ public:
         Abc::Box3d m_childBounds;
 
         // type, wrap, and nVertices
-        //std::size_t m_numCurves;
         Abc::Int32ArraySamplePtr m_nVertices;
 
         CurveType m_type;
