@@ -49,7 +49,6 @@ static Box3d g_bounds;
 //-*****************************************************************************
 void accumXform( M44d &xf, IObject obj )
 {
-    //IObject parent = obj.getParent();
     if ( IXform::matches( obj.getHeader() ) )
     {
         IXform x( obj, kWrapExisting );
