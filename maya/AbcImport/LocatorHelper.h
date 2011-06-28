@@ -1,7 +1,7 @@
 //-*****************************************************************************
 //
 // Copyright (c) 2009-2011,
-//  Sony Pictures Imageworks Inc. and
+//  Sony Pictures Imageworks, Inc. and
 //  Industrial Light & Magic, a division of Lucasfilm Entertainment Company Ltd.
 //
 // All rights reserved.
@@ -16,7 +16,7 @@
 // in the documentation and/or other materials provided with the
 // distribution.
 // *       Neither the name of Sony Pictures Imageworks, nor
-// Industrial Light & Magic, nor the names of their contributors may be used
+// Industrial Light & Magic nor the names of their contributors may be used
 // to endorse or promote products derived from this software without specific
 // prior written permission.
 //
@@ -34,35 +34,26 @@
 //
 //-*****************************************************************************
 
-#ifndef _AlembicExport_MayaPointPrimitiveWriter_h_
-#define _AlembicExport_MayaPointPrimitiveWriter_h_
 
-#include "Foundation.h"
-#include "AttributesWriter.h"
-#include "MayaTransformWriter.h"
+#ifndef ABCIMPORT_LOCATORHELPER_H_
+#define ABCIMPORT_LOCATORHELPER_H_
 
-#include <Alembic/AbcGeom/OPoints.h>
+#include <maya/MObject.h>
 
-class MayaPointPrimitiveWriter
-{
-  public:
+#include <vector>
+#include <string>
 
-    MayaPointPrimitiveWriter(double iFrame, MDagPath & iDag,
-        Alembic::AbcGeom::OObject & iParent, Alembic::Util::uint32_t iTimeIndex,
-        const JobArgs & iArgs);
+#include <Alembic/AbcGeom/IXform.h>
 
-    void write(double iFrame);
-    bool isAnimated() const;
-    unsigned int getNumCVs();
-    AttributesWriterPtr getAttrs() {return mAttrs;};
+class MDagPath;
 
-  private:
+MObject create(Alembic::AbcGeom::IXform & iLocator,
+               MObject & iParent,
+               Alembic::Abc::IScalarProperty & iLocProp,
+               MDagPath & oCurrentDagNode);
 
-    bool mIsAnimated;
-    MDagPath mDagPath;
+void read(double iFrame,
+          Alembic::AbcGeom::IXform & iLocator,
+          std::vector< double > & oArray);
 
-    AttributesWriterPtr mAttrs;
-    Alembic::AbcGeom::OPointsSchema mSchema;
-};
-
-#endif  // _AlembicExport_MayaPointPrimitiveWriter_h_
+#endif  // ABCIMPORT_LOCATORHELPER_H_
