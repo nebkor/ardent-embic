@@ -420,7 +420,7 @@ def find_boost_include( cmakecache = None ):
 
     boost_include_dir = find_path( mf, default )
     try:
-        bid = boost_include_dir[:boost_include_dir.index( "boost" )]
+        bid = boost_include_dir[:boost_include_dir.rindex( "boost" )]
     except ValueError:
         bid = boost_include_dir.dirname()
         print
@@ -1025,7 +1025,7 @@ def makeParser( mk_cmake_basename ):
 
     configOptions.add_option( "--shared", dest="sharedLibs",
                               action="store_true", default=False,
-                              help="Build shared libraries" )                              
+                              help="Build shared libraries" )
 
     configOptions.add_option( "--cflags", dest="cflags", type="string",
                               default=None, help="CFLAGS to pass to the compiler",
