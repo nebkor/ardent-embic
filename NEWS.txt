@@ -16,7 +16,7 @@ recognized with this release.
 
 The complete code changes for this release can be examined here:
 
-http://codereview.appspot.com/4625070
+http://codereview.appspot.com/4662068
 
 Some highlights:
 
@@ -30,6 +30,10 @@ Some highlights:
 
  - The PRMan procedural now supports the Points, NuPatch, Curves, and FaceSet
    types from AbcGeom.
+
+One other important thing to note: previous releases of Alembic did not
+require any of the compiled Boost libraries, but going forward, Alembic
+requires libboost_thread.
 
 Although this is our initial 1.0 release candidate, it should still be
 considered pre-release software, and should not be used for critical, deadline-
