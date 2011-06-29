@@ -2,8 +2,11 @@
 
 Hello, Alembic users, welcome to the latest beta version of Alembic.  As we
 close in on a 1.0 release, we hope the API and file format are now stable
-and fully forwards-compatible, though as with all beta software, we don't
-guarantee that.
+and fully forwards-compatible.  We consider these to be at a first
+"Release Candidate" stage. (note that this doesn't yet apply to the
+application-specific reference implementations). As with all pre-release
+software, we can't guarantee that changes won’t occur between now and a full
+1.0 release.
 
 This release is mostly a bugfix and cleanup release.  We've improved the build
 support for Windows and OS X, as well as conformed the definitions of the Curves
@@ -28,8 +31,9 @@ Some highlights:
  - The PRMan procedural now supports the Points, NuPatch, Curves, and FaceSet
    types from AbcGeom.
 
-Although this is our initial 1.0 release candidate, it is still to be considered
-Beta, and should not be used for critical, deadline-driven production work.
+Although this is our initial 1.0 release candidate, it should still be
+considered pre-release software, and should not be used for critical, deadline-
+driven production work.
 
 Also as usual, feedback and questions are welcome!  The main discussion list
 is low-traffic, but anyone can sign up and participate:
