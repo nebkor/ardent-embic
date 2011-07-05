@@ -47,7 +47,7 @@ IArrayProperty::~IArrayProperty()
 }
 
 //-*****************************************************************************
-size_t IArrayProperty::getNumSamples()
+size_t IArrayProperty::getNumSamples() const
 {
     ALEMBIC_ABC_SAFE_CALL_BEGIN( "IArrayProperty::getNumSamples()" );
 
@@ -60,7 +60,7 @@ size_t IArrayProperty::getNumSamples()
 }
 
 //-*****************************************************************************
-bool IArrayProperty::isConstant()
+bool IArrayProperty::isConstant() const
 {
     ALEMBIC_ABC_SAFE_CALL_BEGIN( "IArrayProperty::isConstant()" );
 
@@ -69,11 +69,11 @@ bool IArrayProperty::isConstant()
     ALEMBIC_ABC_SAFE_CALL_END();
 
     // Not all error handlers throw, so return a default.
-    return true;
+    return false;
 }
 
 //-*****************************************************************************
-bool IArrayProperty::isScalarLike()
+bool IArrayProperty::isScalarLike() const
 {
     ALEMBIC_ABC_SAFE_CALL_BEGIN( "IArrayProperty::isScalarLike()" );
 
@@ -86,7 +86,7 @@ bool IArrayProperty::isScalarLike()
 }
 
 //-*****************************************************************************
-AbcA::TimeSamplingPtr IArrayProperty::getTimeSampling()
+AbcA::TimeSamplingPtr IArrayProperty::getTimeSampling() const
 {
     ALEMBIC_ABC_SAFE_CALL_BEGIN( "IArrayProperty::getTimeSampling()" );
 
