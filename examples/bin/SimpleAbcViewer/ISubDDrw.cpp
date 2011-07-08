@@ -103,9 +103,15 @@ void ISubDDrw::setTime( chrono_t iSeconds )
     Int32ArraySamplePtr indices = psamp.getFaceIndices();
     Int32ArraySamplePtr counts = psamp.getFaceCounts();
 
+    Box3d bounds;
+    bounds.makeEmpty();
+    IBox3dProperty bprop = m_subD.getSchema().getSelfBounds();
+
+    if ( bprop ) { bounds = bprop.getValue( ss ); }
+
     // Update the mesh hoo-ha.
     m_drwHelper.update( P, V3fArraySamplePtr(),
-                        indices, counts );
+                        indices, counts, bounds );
 
     if ( !m_drwHelper.valid() )
     {
