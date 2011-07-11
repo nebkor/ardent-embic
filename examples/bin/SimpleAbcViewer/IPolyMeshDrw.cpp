@@ -49,6 +49,12 @@ IPolyMeshDrw::IPolyMeshDrw( IPolyMesh &iPmesh )
         return;
     }
 
+    if ( m_polyMesh.getSchema().getNumSamples() > 0 )
+    {
+        m_polyMesh.getSchema().get( m_samp );
+    }
+
+    m_boundsProp = m_polyMesh.getSchema().getSelfBounds();
 
     // The object has already set up the min time and max time of
     // all the children.
@@ -93,7 +99,12 @@ void IPolyMeshDrw::setTime( chrono_t iSeconds )
     // Use nearest for now.
     ISampleSelector ss( iSeconds, ISampleSelector::kNearIndex );
     IPolyMeshSchema::Sample psamp;
-    if ( m_polyMesh.getSchema().getNumSamples() > 0 )
+
+    if ( m_polyMesh.getSchema().isConstant() )
+    {
+        psamp = m_samp;
+    }
+    else if ( m_polyMesh.getSchema().getNumSamples() > 0 )
     {
         m_polyMesh.getSchema().get( psamp, ss );
     }
@@ -105,9 +116,11 @@ void IPolyMeshDrw::setTime( chrono_t iSeconds )
 
     Box3d bounds;
     bounds.makeEmpty();
-    IBox3dProperty bprop = m_polyMesh.getSchema().getSelfBounds();
 
-    if ( bprop ) { bounds = bprop.getValue( ss ); }
+    if ( m_boundsProp && m_boundsProp.getNumSamples() > 0 )
+    {
+        bounds = m_boundsProp.getValue( ss );
+    }
 
     // Update the mesh hoo-ha.
     m_drwHelper.update( P, V3fArraySamplePtr(),
