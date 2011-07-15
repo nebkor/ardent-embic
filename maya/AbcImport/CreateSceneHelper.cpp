@@ -52,6 +52,8 @@
 #include <maya/MFnSet.h>
 #include <maya/MFnTypedAttribute.h>
 
+#include <Alembic/AbcGeom/Visibility.h>
+
 #include <map>
 #include <set>
 #include <string>
@@ -104,7 +106,8 @@ namespace
                 mesh.addAttribute(faceObj,
                     MFnDependencyNode::kLocalDynamicAttr);
 
-                if (!samp.isVisible())
+                if (Alembic::AbcGeom::GetVisibility(faceSet) ==
+                    Alembic::AbcGeom::kVisibilityHidden)
                 {
                     MString visName = "FACESETVIS_";
                     visName += faceSet.getName().c_str();
@@ -132,26 +135,24 @@ namespace
     }
 
     Alembic::Abc::IScalarProperty getVisible(Alembic::Abc::IObject & iNode,
-        std::vector<Prop> & oPropList)
+        bool isObjConstant,
+        std::vector<Prop> & oPropList,
+        std::vector<Alembic::AbcGeom::IObject> & oAnimVisStaticObj)
     {
-        Alembic::Abc::ICompoundProperty props = iNode.getProperties();
-        const Alembic::AbcCoreAbstract::PropertyHeader * visHead =
-            props.getPropertyHeader("visible");
+        Alembic::AbcGeom::IVisibilityProperty visProp =
+            Alembic::AbcGeom::GetVisibilityProperty(iNode);
 
-        if (visHead != NULL && visHead->isScalar() &&
-            visHead->getDataType().getPod() == Alembic::Util::kInt8POD &&
-            visHead->getDataType().getExtent() == 1)
+        if (visProp && !visProp.isConstant())
         {
-            Alembic::Abc::IScalarProperty visProp(props, "visible");
-            if (!visProp.isConstant())
+            Prop prop;
+            prop.mScalar = visProp;
+            oPropList.push_back(prop);
+            if (isObjConstant)
             {
-                Prop prop;
-                prop.mScalar = visProp;
-                oPropList.push_back(prop);
+                oAnimVisStaticObj.push_back(iNode);
             }
-            return visProp;
         }
-        return Alembic::Abc::IScalarProperty();
+        return visProp;
     }
 
     void setConstantVisibility(Alembic::Abc::IScalarProperty iVisProp,
@@ -466,7 +467,8 @@ MStatus CreateSceneVisitor::operator()(Alembic::AbcGeom::ICamera & iNode)
 
     std::size_t firstProp = mData.mPropList.size();
     getAnimatedProps(arbProp, mData.mPropList);
-    Alembic::Abc::IScalarProperty visProp = getVisible(iNode, mData.mPropList);
+    Alembic::Abc::IScalarProperty visProp = getVisible(iNode, numSamples < 2,
+        mData.mPropList, mData.mAnimVisStaticObjList);
 
     if (mAction == CREATE || mAction == CREATE_REMOVE)
     {
@@ -545,7 +547,8 @@ MStatus CreateSceneVisitor::operator()(Alembic::AbcGeom::ICurves & iNode)
 
     std::size_t firstProp = mData.mPropList.size();
     getAnimatedProps(arbProp, mData.mPropList);
-    Alembic::Abc::IScalarProperty visProp = getVisible(iNode, mData.mPropList);
+    Alembic::Abc::IScalarProperty visProp = getVisible(iNode, numSamples < 2,
+        mData.mPropList, mData.mAnimVisStaticObjList);
 
     if (mAction == CREATE || mAction == CREATE_REMOVE)
     {
@@ -616,8 +619,10 @@ MStatus CreateSceneVisitor::operator()(Alembic::AbcGeom::IPoints& iNode)
 
         // don't currently care about anything animated on a particleObj
         std::vector<Prop> fakePropList;
+        std::vector<Alembic::AbcGeom::IObject> fakeObjList;
+
         Alembic::Abc::IScalarProperty visProp =
-            getVisible(iNode, fakePropList);
+            getVisible(iNode, false, fakePropList, fakeObjList);
 
         setConstantVisibility(visProp, particleObj);
         addProps(arbProp, particleObj);
@@ -644,7 +649,8 @@ MStatus CreateSceneVisitor::operator()(Alembic::AbcGeom::ISubD& iNode)
 
     std::size_t firstProp = mData.mPropList.size();
     getAnimatedProps(arbProp, mData.mPropList);
-    Alembic::Abc::IScalarProperty visProp = getVisible(iNode, mData.mPropList);
+    Alembic::Abc::IScalarProperty visProp = getVisible(iNode, numSamples < 2,
+        mData.mPropList, mData.mAnimVisStaticObjList);
 
     if (mAction == CREATE || mAction == CREATE_REMOVE)
     {
@@ -710,7 +716,8 @@ MStatus CreateSceneVisitor::operator()(Alembic::AbcGeom::IPolyMesh& iNode)
 
     std::size_t firstProp = mData.mPropList.size();
     getAnimatedProps(arbProp, mData.mPropList);
-    Alembic::Abc::IScalarProperty visProp = getVisible(iNode, mData.mPropList);
+    Alembic::Abc::IScalarProperty visProp = getVisible(iNode, numSamples < 2,
+        mData.mPropList, mData.mAnimVisStaticObjList);
 
     if (mAction == CREATE || mAction == CREATE_REMOVE)
     {
@@ -774,7 +781,8 @@ MStatus CreateSceneVisitor::operator()(Alembic::AbcGeom::INuPatch& iNode)
 
     std::size_t firstProp = mData.mPropList.size();
     getAnimatedProps(arbProp, mData.mPropList);
-    Alembic::Abc::IScalarProperty visProp = getVisible(iNode, mData.mPropList);
+    Alembic::Abc::IScalarProperty visProp = getVisible(iNode, numSamples < 2,
+        mData.mPropList, mData.mAnimVisStaticObjList);
 
     if (mAction == CREATE || mAction == CREATE_REMOVE)
     {
@@ -830,7 +838,6 @@ MStatus CreateSceneVisitor::operator()(Alembic::AbcGeom::IXform & iNode)
 
     std::size_t firstProp = mData.mPropList.size();
     getAnimatedProps(arbProp, mData.mPropList);
-    Alembic::Abc::IScalarProperty visProp = getVisible(iNode, mData.mPropList);
 
     if (iNode.getProperties().getPropertyHeader("locator") != NULL)
     {
@@ -843,6 +850,9 @@ MStatus CreateSceneVisitor::operator()(Alembic::AbcGeom::IXform & iNode)
         {
             Alembic::Abc::IScalarProperty locProp(props, "locator");
             bool isConstant = locProp.isConstant();
+
+            Alembic::Abc::IScalarProperty visProp = getVisible(iNode,
+                isConstant, mData.mPropList, mData.mAnimVisStaticObjList);
 
             // add animated locator to the list
             if (!isConstant)
@@ -886,10 +896,21 @@ MStatus CreateSceneVisitor::operator()(Alembic::AbcGeom::IXform & iNode)
 
         size_t numChildren = iNode.getNumChildren();
         bool isConstant = iNode.getSchema().isConstant();
+
+        Alembic::Abc::IScalarProperty visProp = getVisible(iNode,
+            isConstant, mData.mPropList, mData.mAnimVisStaticObjList);
+
+        Alembic::AbcGeom::XformSample samp;
+        iNode.getSchema().get(samp, 0);
         if (!isConstant)
         {
             mData.mXformList.push_back(iNode);
-            mData.mIsComplexXform.push_back(isComplex(iNode));
+            mData.mIsComplexXform.push_back(isComplex(samp));
+        }
+
+        if (isConstant && visProp.valid() && !visProp.isConstant())
+        {
+             mData.mAnimVisStaticObjList.push_back(iNode);
         }
 
         // There might be children under the current DAG node that
@@ -958,15 +979,6 @@ MStatus CreateSceneVisitor::operator()(Alembic::AbcGeom::IXform & iNode)
 
             trans.setName(name);
 
-            MPlug dstPlug;
-            dstPlug = trans.findPlug("inheritsTransform");
-            if (!dstPlug.isNull())
-            {
-                dstPlug.setBool( iNode.getSchema().getInheritsXforms(
-                    Alembic::Abc::ISampleSelector(mFrame,
-                        Alembic::Abc::ISampleSelector::kNearIndex)) );
-            }
-
             setConstantVisibility(visProp, xformObj);
             addProps(arbProp, xformObj);
         }
@@ -979,7 +991,7 @@ MStatus CreateSceneVisitor::operator()(Alembic::AbcGeom::IXform & iNode)
             if (xformObj.hasFn(MFn::kTransform))
             {
                 std::vector<std::string> transopNameList;
-                connectToXform(mFrame, iNode, xformObj, transopNameList,
+                connectToXform(samp, isConstant, xformObj, transopNameList,
                     mData.mPropList, firstProp);
 
                 if (!isConstant)

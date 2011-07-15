@@ -240,8 +240,17 @@ MayaMeshWriter::MayaMeshWriter(MDagPath & iDag,
             {
                 faceSet = mSubDSchema.createFaceSet(faceSetName);
             }
-            Alembic::AbcGeom::OFaceSetSchema::Sample samp(
-                Alembic::Abc::Int32ArraySample(faceVals), isVisible);
+            Alembic::AbcGeom::OFaceSetSchema::Sample samp;
+            samp.setFaces(Alembic::Abc::Int32ArraySample(faceVals));
+
+            if (!isVisible)
+            {
+                Alembic::AbcGeom::OVisibilityProperty visProp =
+                    Alembic::AbcGeom::CreateVisibilityProperty( faceSet, 0 );
+                Alembic::Abc::int8_t visVal = 0;
+                visProp.set(visVal);
+            }
+
             faceSet.getSchema().set(samp);
         }
     }
@@ -504,10 +513,7 @@ void MayaMeshWriter::writeSubD(MDagPath & iDag,
 
     mNumPoints = lMesh.numVertices();
 
-    // look for some of the renderman specific extra flags
-    // The attribute is called facevaryingType because at one time it
-    // was a more complicated enum
-    MPlug plug = lMesh.findPlug("facevaryingType");
+    MPlug plug = lMesh.findPlug("facVaryingInterpolateBoundary");
     if (!plug.isNull())
         samp.setFaceVaryingInterpolateBoundary(plug.asInt());
 
