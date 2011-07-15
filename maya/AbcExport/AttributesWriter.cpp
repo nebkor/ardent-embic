@@ -43,7 +43,8 @@ namespace AbcA = Alembic::AbcCoreAbstract;
 
 namespace {
 
-static const char * cAttrScope = "_AttrScope";
+static const char * cAttrScope = "_AbcGeomScope";
+static const char * cAttrType  = "_AbcType";
 
 // returns true if a plug is of a simple numeric data type
 bool isDataAttr(const MPlug & iParent)
@@ -60,6 +61,15 @@ bool isDataAttr(const MPlug & iParent)
         case MFn::kData3Int:
         case MFn::kData2Short:
         case MFn::kData3Short:
+        case MFn::kStringData:
+        case MFn::kStringArrayData:
+        case MFn::kFloatVectorArrayData:
+        case MFn::kVectorArrayData:
+        case MFn::kFloatArrayData:
+        case MFn::kDoubleArrayData:
+        case MFn::kIntArrayData:
+        case MFn::kPointArrayData:
+        case MFn::kUInt64ArrayData:
             return true;
         break;
 
@@ -73,28 +83,33 @@ bool isDataAttr(const MPlug & iParent)
 AbcGeom::GeometryScope strToScope(MString iStr)
 {
     iStr.toLowerCase();
-    if (iStr == "point")
+    if (iStr == "vtx")
     {
         return AbcGeom::kVertexScope;
     }
-    else if (iStr == "vertex")
+    else if (iStr == "fvr")
     {
         return AbcGeom::kFacevaryingScope;
     }
-    else if (iStr == "face")
+    else if (iStr == "uni")
     {
         return AbcGeom::kUniformScope;
+    }
+    else if (iStr == "var")
+    {
+        return AbcGeom::kVaryingScope;
     }
 
     return AbcGeom::kConstantScope;
 }
 
-// returns true if the string ends with _AttrScope
+// returns true if the string ends with _AbcGeomScope or _AbcType
 bool endsWithArbAttr(const std::string & iStr)
 {
     size_t len = iStr.size();
 
-    return (len >= 10 && iStr.compare(len - 10, 10, cAttrScope) == 0);
+    return (len >= 13 && iStr.compare(len - 13, 13, cAttrScope) == 0) ||
+        (len >= 8 && iStr.compare(len - 8, 8, cAttrType) == 0);
 }
 
 
@@ -733,13 +748,19 @@ bool MFnTypedDataToSample(MFnData::Type iType,
 
             unsigned int i = 0;
             unsigned int length = arr.length();
-            std::vector< double > val(length*3);
+            unsigned int extent = oProp.getDataType().getExtent();
+            std::vector< double > val(length*extent);
             for (; i < length; i++)
             {
                 MPoint pt(arr[i]);
-                val[3*i] = pt.x;
-                val[3*i+1] = pt.y;
-                val[3*i+2] = pt.z;
+                val[extent*i] = pt.x;
+                val[extent*i+1] = pt.y;
+
+                if (extent > 2)
+                    val[extent*i+2] = pt.z;
+
+                if (extent > 3)
+                    val[extent*i+3] = pt.w;
             }
             AbcA::ArraySample samp(&(val.front()), oProp.getDataType(),
                 Alembic::Util::Dimensions(length));
@@ -753,13 +774,16 @@ bool MFnTypedDataToSample(MFnData::Type iType,
 
             unsigned int i = 0;
             unsigned int length = arr.length();
-            std::vector< double > val(length*3);
+            unsigned int extent = oProp.getDataType().getExtent();
+            std::vector< double > val(length*extent);
             for (; i < length; i++)
             {
                 MVector v(arr[i]);
-                val[3*i] = v.x;
-                val[3*i+1] = v.y;
-                val[3*i+2] = v.z;
+                val[extent*i] = v.x;
+                val[extent*i+1] = v.y;
+
+                if (extent > 2)
+                   val[extent*i+2] = v.z;
             }
             AbcA::ArraySample samp(&(val.front()), oProp.getDataType(),
                 Alembic::Util::Dimensions(length));
@@ -835,6 +859,7 @@ void createPropertyFromMFnAttr(const MObject& iAttr, const MPlug& iPlug,
     Abc::OCompoundProperty & iParent,
     Alembic::Util::uint32_t iTimeIndex,
     AbcGeom::GeometryScope iScope,
+    const MString & iTypeStr,
     std::vector < PlugAndObjArray > & oArrayVec)
 {
     // for some reason we have just 1 of the elements of an array, bail
@@ -930,9 +955,18 @@ void createPropertyFromMFnAttr(const MObject& iAttr, const MPlug& iPlug,
                 PlugAndObjArray p;
                 p.plug = iPlug;
                 p.obj = iAttr;
-                AbcGeom::OP3dGeomParam gp(iParent, plugName, false, iScope, 1,
-                    iTimeIndex);
-                p.prop = gp.getValueProperty();
+                if (iTypeStr  == "point2")
+                {
+                    AbcGeom::OP2dGeomParam gp(iParent, plugName, false, iScope,
+                        1, iTimeIndex);
+                    p.prop = gp.getValueProperty();
+                }
+                else
+                {
+                    AbcGeom::OP3dGeomParam gp(iParent, plugName, false, iScope,
+                        1, iTimeIndex);
+                    p.prop = gp.getValueProperty();
+                }
                 oArrayVec.push_back(p);
             }
             break;
@@ -942,9 +976,30 @@ void createPropertyFromMFnAttr(const MObject& iAttr, const MPlug& iPlug,
                 PlugAndObjArray p;
                 p.plug = iPlug;
                 p.obj = iAttr;
-                AbcGeom::OV3dGeomParam gp(iParent, plugName, false, iScope, 1,
-                    iTimeIndex);
-                p.prop = gp.getValueProperty();
+                if (iTypeStr == "vector2")
+                {
+                    AbcGeom::OV2dGeomParam gp(iParent, plugName, false, iScope,
+                        1, iTimeIndex);
+                    p.prop = gp.getValueProperty();
+                }
+                else if (iTypeStr == "normal2")
+                {
+                    AbcGeom::ON2dGeomParam gp(iParent, plugName, false, iScope,
+                        1, iTimeIndex);
+                    p.prop = gp.getValueProperty();
+                }
+                else if (iTypeStr == "normal3")
+                {
+                    AbcGeom::ON3dGeomParam gp(iParent, plugName, false, iScope,
+                        1, iTimeIndex);
+                    p.prop = gp.getValueProperty();
+                }
+                else
+                {
+                    AbcGeom::OV3dGeomParam gp(iParent, plugName, false, iScope,
+                        1, iTimeIndex);
+                    p.prop = gp.getValueProperty();
+                }
                 oArrayVec.push_back(p);
             }
             break;
@@ -1059,13 +1114,20 @@ AttributesWriter::AttributesWriter(
             scope = strToScope(scopePlug.asString());
         }
 
+        MString typeStr;
+        MPlug typePlug = iNode.findPlug(propName + cAttrType);
+        if (!typePlug.isNull())
+        {
+            typeStr= typePlug.asString();
+        }
+
         switch (sampType)
         {
             // static
             case 0:
             {
                 createPropertyFromMFnAttr(attr, plug, iParent, 0,
-                    scope, staticPlugObjArrayVec);
+                    scope, typeStr, staticPlugObjArrayVec);
             }
             break;
 
@@ -1075,7 +1137,7 @@ AttributesWriter::AttributesWriter(
             case 2:
             {
                 createPropertyFromMFnAttr(attr, plug, iParent, iTimeIndex,
-                    scope, mPlugObjArrayVec);
+                    scope, typeStr, mPlugObjArrayVec);
             }
             break;
         }
@@ -1131,9 +1193,12 @@ AttributesWriter::AttributesWriter(
             // static visibility 0 case
             case 1:
             {
-                Alembic::Util::int8_t visVal = 0;
+                Alembic::Util::int8_t visVal =
+                    Alembic::AbcGeom::kVisibilityHidden;
 
-                Abc::OCharProperty bp(parent, "visible");
+                Abc::OCharProperty bp =
+                    Alembic::AbcGeom::CreateVisibilityProperty(
+                        visPlug.propParent, 0);
                 bp.set(visVal);
             }
             break;
@@ -1141,9 +1206,13 @@ AttributesWriter::AttributesWriter(
             // animated visibility 0 case
             case 2:
             {
-                Alembic::Util::int8_t visVal = 0;
+                Alembic::Util::int8_t visVal =
+                    Alembic::AbcGeom::kVisibilityHidden;
 
-                Abc::OCharProperty bp(parent, "visible", iTimeIndex);
+                Abc::OCharProperty bp = 
+                    Alembic::AbcGeom::CreateVisibilityProperty(
+                        visPlug.propParent, iTimeIndex);
+
                 bp.set(visVal);
                 visPlug.prop = bp;
                 mAnimVisibility = visPlug;
@@ -1160,8 +1229,14 @@ AttributesWriter::AttributesWriter(
                 }
 
                 mAnimVisibility = visPlug;
-                Alembic::Util::int8_t visVal = -1;
-                Abc::OCharProperty bp(parent, "visible", iTimeIndex);
+
+                Alembic::Util::int8_t visVal =
+                    Alembic::AbcGeom::kVisibilityDeferred;
+
+                Abc::OCharProperty bp = 
+                    Alembic::AbcGeom::CreateVisibilityProperty(
+                        visPlug.propParent, iTimeIndex);
+
                 bp.set(visVal);
                 visPlug.prop = bp;
                 mAnimVisibility = visPlug;
