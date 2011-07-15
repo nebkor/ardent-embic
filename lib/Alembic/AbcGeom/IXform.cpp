@@ -138,11 +138,13 @@ void IXformSchema::init( Abc::SchemaInterpMatching iMatching )
             while ( op != opEnd )
             {
                 std::size_t numChans = op->getNumChannels();
+                bool foundChan = false;
                 while ( curChan < numChans )
                 {
                     if ( animChan == chanPos )
                     {
                         op->m_animChannels.insert( curChan );
+                        foundChan = true;
                         break;
                     }
 
@@ -150,8 +152,8 @@ void IXformSchema::init( Abc::SchemaInterpMatching iMatching )
                     ++chanPos;
                 }
 
-                // move on to the next animChan
-                if ( animChan == chanPos )
+                // move on to the next animChan, because we found the current one
+                if ( foundChan == true )
                 {
                     ++curChan;
                     ++chanPos;
@@ -256,6 +258,8 @@ void IXformSchema::get( XformSample &oSamp, const Abc::ISampleSelector &iSS )
 
     if ( ! valid() ) { return; }
 
+    oSamp = m_sample;
+
     if ( m_inherits.getNumSamples() )
     {
         oSamp.setInheritsXforms( m_inherits.getValue( iSS ) );
@@ -284,8 +288,6 @@ void IXformSchema::get( XformSample &oSamp, const Abc::ISampleSelector &iSS )
                                           numSamples );
 
     if ( sampIdx < 0 ) { return; }
-
-    oSamp = m_sample;
 
     this->getChannelValues( sampIdx, oSamp );
 
