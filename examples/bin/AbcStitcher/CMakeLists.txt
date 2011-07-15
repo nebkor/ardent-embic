@@ -1,6 +1,6 @@
 ##-*****************************************************************************
 ##
-## Copyright (c) 2009-2010, Industrial Light & Magic,
+## Copyright (c) 2009-2011, Industrial Light & Magic,
 ##   a division of Lucasfilm Entertainment Company Ltd.
 ##
 ## All rights reserved.
@@ -32,25 +32,18 @@
 ##
 ##-*****************************************************************************
 
-IF ( GLUT_Xmu_LIBRARY OR WINDOWS)
-  MESSAGE( STATUS "Including GlutSkeleton" )
-  ADD_SUBDIRECTORY( GlutSkeleton )
+SET( FULL_ABC_LIBS
+     AlembicAbcGeom
+     AlembicAbc
+     AlembicAbcCoreHDF5
+     AlembicAbcCoreAbstract
+     AlembicUtil
+     ${ALEMBIC_HDF5_LIBS}
+     ${ALEMBIC_ILMBASE_LIBS}
+     ${CMAKE_THREAD_LIBS_INIT}
+     ${ZLIB_LIBRARIES} ${EXTERNAL_MATH_LIBS} )
 
-  IF ( Boost_PROGRAM_OPTIONS_FOUND )
-    MESSAGE( STATUS "Including SimpleAbcViewer" )
-    ADD_SUBDIRECTORY( SimpleAbcViewer )
-  ELSE()
-    MESSAGE( STATUS "Not including SimpleAbcViewer" )
-  ENDIF()
+#-******************************************************************************
+ADD_EXECUTABLE( abcstitcher AbcStitcher.cpp util.cpp)
+TARGET_LINK_LIBRARIES( abcstitcher ${FULL_ABC_LIBS} )
 
-ELSE()
-  MESSAGE( STATUS "Not including GlutSkeleton" )
-  MESSAGE( STATUS "Not including SimpleAbcViewer" )
-ENDIF()
-
-ADD_SUBDIRECTORY( AbcEcho )
-ADD_SUBDIRECTORY( AbcStitcher )
-
-# NOTE: uncomment the following line if you have the GTO libraries and wish
-# to try building the GTO->Alembic conversion utility.
-#ADD_SUBDIRECTORY( GtoMeshesToAbc EXCLUDE_FROM_ALL )
