@@ -1,6 +1,6 @@
 //-*****************************************************************************
 //
-// Copyright (c) 2009-2010,
+// Copyright (c) 2009-2011,
 //  Sony Pictures Imageworks Inc. and
 //  Industrial Light & Magic, a division of Lucasfilm Entertainment Company Ltd.
 //
@@ -62,6 +62,11 @@ void IPointsSchema::init( const Abc::Argument &iArg0,
     {
         m_velocities = Abc::IV3fArrayProperty( _this, ".velocities",
                                                iArg0, iArg1 );
+    }
+
+    if ( _this->getPropertyHeader( ".widths" ) != NULL )
+    {
+        m_widths = IFloatGeomParam( _this, ".widths", iArg0, iArg1 );
     }
 
     if ( _this->getPropertyHeader( ".childBnds" ) != NULL )

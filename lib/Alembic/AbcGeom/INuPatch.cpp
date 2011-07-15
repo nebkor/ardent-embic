@@ -86,6 +86,10 @@ MeshTopologyVariance INuPatchSchema::getTopologyVariance()
                 return kHeterogenousTopology;
             }
         }
+        else if ( m_positionWeights && !m_positionWeights.isConstant() )
+        {
+            return kHomogenousTopology;
+        }
         else
         {
             return kConstantTopology;
@@ -123,19 +127,19 @@ MeshTopologyVariance INuPatchSchema::getTopologyVariance()
 bool INuPatchSchema::hasTrimProps()
 {
     return this->getPropertyHeader( "trim_nloops" ) != NULL &&
-        this->getPropertyHeader( "trim_n" ) != NULL &&
-        this->getPropertyHeader( "trim_order" ) != NULL &&
-        this->getPropertyHeader( "trim_knot" ) != NULL &&
-        this->getPropertyHeader( "trim_min" ) != NULL &&
-        this->getPropertyHeader( "trim_max" ) != NULL &&
-        this->getPropertyHeader( "trim_u" ) != NULL &&
-        this->getPropertyHeader( "trim_v" ) != NULL &&
-        this->getPropertyHeader( "trim_w" ) != NULL;
+           this->getPropertyHeader( "trim_n" ) != NULL &&
+           this->getPropertyHeader( "trim_order" ) != NULL &&
+           this->getPropertyHeader( "trim_knot" ) != NULL &&
+           this->getPropertyHeader( "trim_min" ) != NULL &&
+           this->getPropertyHeader( "trim_max" ) != NULL &&
+           this->getPropertyHeader( "trim_u" ) != NULL &&
+           this->getPropertyHeader( "trim_v" ) != NULL &&
+           this->getPropertyHeader( "trim_w" ) != NULL;
 }
 
 //-*****************************************************************************
 void INuPatchSchema::get( sample_type &oSample,
-                          const Abc::ISampleSelector &iSS)
+                          const Abc::ISampleSelector &iSS )
 {
     ALEMBIC_ABC_SAFE_CALL_BEGIN( "INuPatch::get()" );
 
@@ -157,6 +161,11 @@ void INuPatchSchema::get( sample_type &oSample,
         m_childBounds.get( oSample.m_childBounds, iSS );
     }
 
+    if ( m_positionWeights )
+    {
+        m_positionWeights.get( oSample.m_positionWeights, iSS );
+    }
+
     // handle trim curves
     if ( this->hasTrimCurve() )
     {
@@ -171,7 +180,6 @@ void INuPatchSchema::get( sample_type &oSample,
         m_trimV.get( oSample.m_trimV, iSS );
         m_trimW.get( oSample.m_trimW, iSS );
     }
-
 
     ALEMBIC_ABC_SAFE_CALL_END();
 }
@@ -225,6 +233,13 @@ void INuPatchSchema::init( const Abc::Argument &iArg0,
     }
 
     // none of the things below here are guaranteed to exist
+
+    if ( this->getPropertyHeader( "w" ) != NULL )
+    {
+        m_positionWeights = Abc::IFloatArrayProperty( _this, "w",
+                                        args.getSchemaInterpMatching() );
+    }
+
     if ( this->getPropertyHeader( "N" ) != NULL )
     {
         m_normals = IN3fGeomParam( _this, "N", iArg0, iArg1 );
