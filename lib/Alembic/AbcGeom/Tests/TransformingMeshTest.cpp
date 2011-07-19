@@ -39,6 +39,11 @@
 #include <Alembic/AbcGeom/All.h>
 #include <Alembic/AbcCoreHDF5/All.h>
 
+// Other includes
+#include <iostream>
+#include <stdio.h>
+#include <stdlib.h>
+
 #include "Assert.h"
 
 #include <Alembic/AbcGeom/Tests/MeshData.h>
@@ -101,7 +106,7 @@ void Example1_MeshOut()
 
     OObject top = archive.getTop();
 
-    OXform parentXform = recurseCreateXform( top, 2, 10, 100 );
+    OXform parentXform = recurseCreateXform( top, 3, 5, 10 );
 
     OXform xf( parentXform, "xf", g_ts );
 
@@ -128,27 +133,11 @@ void Example1_MeshOut()
     }
 }
 
-//-*****************************************************************************
-void Example1_MeshIn()
-{
-    IArchive archive( Alembic::AbcCoreHDF5::ReadArchive(),
-                      "transformingMesh1.abc" );
-
-    IXform xf( archive.getTop(), "xf" );
-
-    IXformSchema xfs = xf.getSchema();
-
-    TimeSamplingPtr ts = xfs.getTimeSampling();
-
-    TESTING_ASSERT( ts->getTimeSamplingType().isUniform() );
-
-}
 
 //-*****************************************************************************
 int main( int argc, char *argv[] )
 {
     Example1_MeshOut();
-    //Example1_MeshIn();
 
     return 0;
 }
