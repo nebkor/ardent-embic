@@ -156,8 +156,6 @@ private:
     uint32_t m_numSamplesPerCycle;
     chrono_t m_timePerCycle;
 
-    static const uint32_t ACYCLIC_NUM_SAMPLES;
-    static const chrono_t ACYCLIC_TIME_PER_CYCLE;
 public:
     friend std::ostream &operator<<( std::ostream &ostr,
                                      const TimeSamplingType &tst );
