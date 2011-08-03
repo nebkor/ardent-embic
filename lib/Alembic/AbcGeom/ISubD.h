@@ -37,20 +37,22 @@
 #ifndef _Alembic_AbcGeom_ISubD_h_
 #define _Alembic_AbcGeom_ISubD_h_
 
+#include <boost/thread/mutex.hpp>
 #include <Alembic/AbcGeom/Foundation.h>
 #include <Alembic/AbcGeom/SchemaInfoDeclarations.h>
 #include <Alembic/AbcGeom/IGeomParam.h>
 #include <Alembic/AbcGeom/IFaceSet.h>
+#include <Alembic/AbcGeom/IGeomBase.h>
 
 namespace Alembic {
 namespace AbcGeom {
 
 //-*****************************************************************************
-class ISubDSchema : public Abc::ISchema<SubDSchemaInfo>
+class ISubDSchema : public IGeomBaseSchema<SubDSchemaInfo>
 {
 public:
     //-*************************************************************************
-    // POLY MESH SCHEMA SAMPLE TYPE
+    // SUBD SCHEMA SAMPLE TYPE
     //-*************************************************************************
     class Sample
     {
@@ -197,7 +199,7 @@ public:
 
                  const Abc::Argument &iArg0 = Abc::Argument(),
                  const Abc::Argument &iArg1 = Abc::Argument() )
-      : Abc::ISchema<SubDSchemaInfo>( iParent, iName,
+      : IGeomBaseSchema<SubDSchemaInfo>( iParent, iName,
                                       iArg0, iArg1 )
     {
         init(  iArg0, iArg1 );
@@ -209,7 +211,7 @@ public:
     explicit ISubDSchema( CPROP_PTR iParent,
                           const Abc::Argument &iArg0 = Abc::Argument(),
                           const Abc::Argument &iArg1 = Abc::Argument() )
-      : Abc::ISchema<SubDSchemaInfo>( iParent,
+      : IGeomBaseSchema<SubDSchemaInfo>( iParent,
                                       iArg0, iArg1 )
     {
         init( iArg0, iArg1 );
@@ -222,16 +224,11 @@ public:
 
                  const Abc::Argument &iArg0 = Abc::Argument(),
                  const Abc::Argument &iArg1 = Abc::Argument() )
-      : Abc::ISchema<SubDSchemaInfo>( iThis, iFlag, iArg0, iArg1 )
+      : IGeomBaseSchema<SubDSchemaInfo>( iThis, iFlag, iArg0, iArg1 )
     {
         init( iArg0, iArg1 );
     }
 
-    //! Copy constructor.
-    ISubDSchema(const ISubDSchema& iCopy)
-    {
-        *this = iCopy;
-    }
 
     //! Default assignment operator used.
 
@@ -276,9 +273,12 @@ public:
         return smp;
     }
 
-    Abc::IInt32ArrayProperty getFaceCountsProperty() { return m_faceCountsProperty; }
-    Abc::IInt32ArrayProperty getFaceIndicesProperty() { return m_faceIndicesProperty; }
-    Abc::IV3fArrayProperty getPositionsProperty() { return m_positionsProperty; }
+    Abc::IInt32ArrayProperty getFaceCountsProperty() 
+    { return m_faceCountsProperty; }
+    Abc::IInt32ArrayProperty getFaceIndicesProperty() 
+    { return m_faceIndicesProperty; }
+    Abc::IV3fArrayProperty getPositionsProperty() 
+    { return m_positionsProperty; }
 
     Abc::IInt32Property getFaceVaryingInterpolateBoundaryProperty()
     { return m_faceVaryingInterpolateBoundaryProperty; }
@@ -289,25 +289,24 @@ public:
     Abc::IInt32Property getInterpolateBoundaryProperty()
     { return m_interpolateBoundaryProperty; }
 
-    Abc::IBox3dProperty getSelfBoundsProperty() { return m_selfBoundsProperty; }
-    Abc::IBox3dProperty getChildBoundsProperty() { return m_childBoundsProperty; }
-
-    Abc::IInt32ArrayProperty getCreaseIndicesProperty() { return m_creaseIndicesProperty; }
-    Abc::IInt32ArrayProperty getCreaseLengthsProperty() { return m_creaseLengthsProperty; }
+    Abc::IInt32ArrayProperty getCreaseIndicesProperty() 
+    { return m_creaseIndicesProperty; }
+    Abc::IInt32ArrayProperty getCreaseLengthsProperty() 
+    { return m_creaseLengthsProperty; }
     Abc::IFloatArrayProperty getCreaseSharpnessesProperty()
     { return m_creaseSharpnessesProperty; }
 
-    Abc::IInt32ArrayProperty getCornerIndicesProperty() { return m_cornerIndicesProperty; }
+    Abc::IInt32ArrayProperty getCornerIndicesProperty() 
+    { return m_cornerIndicesProperty; }
     Abc::IFloatArrayProperty getCornerSharpnessesProperty()
     { return m_cornerSharpnessesProperty; }
 
     Abc::IInt32ArrayProperty getHolesProperty() { return m_holesProperty; }
 
-    Abc::IStringProperty getSubdivisionSchemeProperty() { return m_subdSchemeProperty; }
+    Abc::IStringProperty getSubdivisionSchemeProperty()
+    { return m_subdSchemeProperty; }
 
     IV2fGeomParam &getUVsParam() { return m_uvsParam; }
-
-    ICompoundProperty getArbGeomParams() { return m_arbGeomParams; }
 
     //-*************************************************************************
     // ABC BASE MECHANISMS
@@ -340,19 +339,14 @@ public:
 
         m_uvsParam.reset();
 
-        m_arbGeomParams.reset();
-
-        m_faceSetsLoaded = false;
-        m_faceSets.clear();
-
-        Abc::ISchema<SubDSchemaInfo>::reset();
+        IGeomBaseSchema<SubDSchemaInfo>::reset();
     }
 
     //! Valid returns whether this function set is
     //! valid.
     bool valid() const
     {
-        return ( Abc::ISchema<SubDSchemaInfo>::valid() &&
+        return ( IGeomBaseSchema<SubDSchemaInfo>::valid() &&
                  m_positionsProperty.valid() &&
                  m_faceIndicesProperty.valid() &&
                  m_faceCountsProperty.valid() );
@@ -367,6 +361,13 @@ public:
     //! unspecified-bool-type operator overload.
     //! ...
     ALEMBIC_OVERRIDE_OPERATOR_BOOL( ISubDSchema::valid() );
+
+    // Copy constructors
+    ISubDSchema(const ISubDSchema& iCopy)
+    {
+        *this = iCopy;
+    }
+    const ISubDSchema & operator=(const ISubDSchema & rhs);
 
 protected:
     void init( const Abc::Argument &iArg0, const Abc::Argument &iArg1 );
@@ -395,20 +396,16 @@ protected:
     // subdivision scheme
     Abc::IStringProperty m_subdSchemeProperty;
 
-    // bounds
-    Abc::IBox3dProperty m_selfBoundsProperty;
-    Abc::IBox3dProperty m_childBoundsProperty;
-
     // UVs
     IV2fGeomParam m_uvsParam;
-
-    // random geometry parameters
-    Abc::ICompoundProperty m_arbGeomParams;
 
     // FaceSets, this starts as empty until client
     // code attempts to access facesets.
     bool                              m_faceSetsLoaded;
     std::map <std::string, IFaceSet>  m_faceSets;
+    boost::mutex                      m_faceSetsMutex;
+    void _loadFaceSetNames();
+
 };
 
 //-*****************************************************************************

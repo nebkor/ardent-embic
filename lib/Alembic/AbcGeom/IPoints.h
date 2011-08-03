@@ -40,12 +40,13 @@
 #include <Alembic/AbcGeom/Foundation.h>
 #include <Alembic/AbcGeom/SchemaInfoDeclarations.h>
 #include <Alembic/AbcGeom/IGeomParam.h>
+#include <Alembic/AbcGeom/IGeomBase.h>
 
 namespace Alembic {
 namespace AbcGeom {
 
 //-*****************************************************************************
-class IPointsSchema : public Abc::ISchema<PointsSchemaInfo>
+class IPointsSchema : public IGeomBaseSchema<PointsSchemaInfo>
 {
 public:
     class Sample
@@ -91,7 +92,7 @@ public:
     };
 
     //-*************************************************************************
-    // POLY MESH SCHEMA
+    // POINTS SCHEMA
     //-*************************************************************************
 public:
     //! By convention we always define this_type in AbcGeom classes.
@@ -119,7 +120,7 @@ public:
 
                    const Abc::Argument &iArg0 = Abc::Argument(),
                    const Abc::Argument &iArg1 = Abc::Argument() )
-      : Abc::ISchema<PointsSchemaInfo>( iParent, iName,
+      : IGeomBaseSchema<PointsSchemaInfo>( iParent, iName,
                                           iArg0, iArg1 )
     {
         init( iArg0, iArg1 );
@@ -131,7 +132,7 @@ public:
     explicit IPointsSchema( CPROP_PTR iParent,
                             const Abc::Argument &iArg0 = Abc::Argument(),
                             const Abc::Argument &iArg1 = Abc::Argument() )
-      : Abc::ISchema<PointsSchemaInfo>( iParent,
+      : IGeomBaseSchema<PointsSchemaInfo>( iParent,
                                      iArg0, iArg1 )
     {
         init( iArg0, iArg1 );
@@ -218,16 +219,6 @@ public:
         return m_idsProperty;
     }
 
-    Abc::IBox3dProperty getSelfBoundsProperty()
-    {
-        return m_selfBoundsProperty;
-    }
-
-    Abc::IBox3dProperty getChildBoundsProperty()
-    {
-        return m_childBoundsProperty;
-    }
-
     IFloatGeomParam getWidthsParam()
     {
         return m_widthsParam;
@@ -248,19 +239,14 @@ public:
         m_idsProperty.reset();
         m_widthsParam.reset();
 
-        m_selfBoundsProperty.reset();
-        m_childBoundsProperty.reset();
-
-        m_arbGeomParams.reset();
-
-        Abc::ISchema<PointsSchemaInfo>::reset();
+        IGeomBaseSchema<PointsSchemaInfo>::reset();
     }
 
     //! Valid returns whether this function set is
     //! valid.
     bool valid() const
     {
-        return ( Abc::ISchema<PointsSchemaInfo>::valid() &&
+        return ( IGeomBaseSchema<PointsSchemaInfo>::valid() &&
                  m_positionsProperty.valid() &&
                  m_idsProperty.valid() );
     }
@@ -277,11 +263,6 @@ protected:
     Abc::IUInt64ArrayProperty m_idsProperty;
     Abc::IV3fArrayProperty m_velocitiesProperty;
     IFloatGeomParam m_widthsParam;
-
-    Abc::IBox3dProperty m_selfBoundsProperty;
-    Abc::IBox3dProperty m_childBoundsProperty;
-
-    Abc::ICompoundProperty m_arbGeomParams;
 };
 
 //-*****************************************************************************

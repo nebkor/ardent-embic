@@ -85,14 +85,6 @@ void IPolyMeshSchema::init( const Abc::Argument &iArg0,
     m_countsProperty = Abc::IInt32ArrayProperty( _this, ".faceCounts",
                                        args.getSchemaInterpMatching() );
 
-    m_selfBoundsProperty = Abc::IBox3dProperty( _this, ".selfBnds", iArg0, iArg1 );
-
-    if ( this->getPropertyHeader( ".childBnds" ) != NULL )
-    {
-        m_childBoundsProperty = Abc::IBox3dProperty( _this, ".childBnds", iArg0,
-                                             iArg1 );
-    }
-
     // none of the things below here are guaranteed to exist
     if ( this->getPropertyHeader( "uv" ) != NULL )
     {
@@ -104,11 +96,18 @@ void IPolyMeshSchema::init( const Abc::Argument &iArg0,
         m_normalsParam = IN3fGeomParam( _this, "N", iArg0, iArg1 );
     }
 
-    if ( this->getPropertyHeader( ".arbGeomParams" ) != NULL )
+
+    IObject _thisObject = this->getParent().getObject();
+    size_t numChildren = _thisObject.getNumChildren();
+    for ( size_t childIndex = 0 ; childIndex < numChildren; childIndex++ )
     {
-        m_arbGeomParams = Abc::ICompoundProperty( _this, ".arbGeomParams",
-                                                  args.getErrorHandlerPolicy()
-                                                );
+        ObjectHeader const & header = _thisObject.getChildHeader (childIndex);
+        if ( IFaceSet::matches( header ) )
+    {
+            // start out with an empty (invalid IFaceSet)
+            // accessor later on will create real IFaceSet object.
+            m_faceSets [header.getName ()] = IFaceSet ();
+        }
     }
 
     m_faceSetsLoaded = false;
@@ -117,15 +116,39 @@ void IPolyMeshSchema::init( const Abc::Argument &iArg0,
 }
 
 //-*****************************************************************************
-void IPolyMeshSchema::getFaceSetNames( std::vector<std::string> &oFaceSetNames )
+const IPolyMeshSchema &
+IPolyMeshSchema::operator=(const IPolyMeshSchema & rhs)
 {
-    ALEMBIC_ABC_SAFE_CALL_BEGIN( "IPolyMeshSchema::getFaceSetNames()" );
+    IGeomBaseSchema<PolyMeshSchemaInfo>::operator=(rhs);
 
-    // iterate over childHeaders, and if header matches FaceSet add to our vec
-    IObject _thisObject = this->getParent().getObject();
+    // lock, reset
+    boost::mutex::scoped_lock l(m_faceSetsMutex);
+    m_faceSetsLoaded = false;
+    m_faceSets.clear ();
+
+    m_positionsProperty = rhs.m_positionsProperty;
+    m_indicesProperty   = rhs.m_indicesProperty;
+    m_countsProperty    = rhs.m_countsProperty;
+                                           
+    m_uvsParam          = rhs.m_uvsParam;
+    m_normalsParam      = rhs.m_normalsParam;
+
+    return *this;
+}
+
+//-*****************************************************************************
+void IPolyMeshSchema::_loadFaceSetNames()
+{
+    // Caller must ensure they have locked m_faceSetsMutex.
+    // (allows us to use non-recursive mutex)
+    ALEMBIC_ABC_SAFE_CALL_BEGIN( "IPolyMeshSchema::_loadFaceSetNames()" );
 
     if (!m_faceSetsLoaded)
     {
+        // iterate over childHeaders, and if header matches 
+        // FaceSet add to our vec
+        IObject _thisObject = this->getParent().getObject();
+
         size_t numChildren = _thisObject.getNumChildren();
         for ( size_t childIndex = 0 ; childIndex < numChildren; childIndex++ )
         {
@@ -139,6 +162,17 @@ void IPolyMeshSchema::getFaceSetNames( std::vector<std::string> &oFaceSetNames )
         }
         m_faceSetsLoaded = true;
     }
+
+    ALEMBIC_ABC_SAFE_CALL_END();
+}
+
+//-*****************************************************************************
+void IPolyMeshSchema::getFaceSetNames( std::vector<std::string> &oFaceSetNames )
+{
+    ALEMBIC_ABC_SAFE_CALL_BEGIN( "IPolyMeshSchema::getFaceSetNames()" );
+
+    boost::mutex::scoped_lock l(m_faceSetsMutex);
+    _loadFaceSetNames();
 
     for ( std::map<std::string, IFaceSet>::const_iterator faceSetIter =
               m_faceSets.begin(); faceSetIter != m_faceSets.end();
@@ -156,10 +190,10 @@ IPolyMeshSchema::hasFaceSet( const std::string &iFaceSetName )
 {
     ALEMBIC_ABC_SAFE_CALL_BEGIN( "IPolyMeshSchema::hasFaceSet (iFaceSetName)" );
 
+    boost::mutex::scoped_lock l(m_faceSetsMutex);
     if (!m_faceSetsLoaded)
     {
-        std::vector <std::string> dummy;
-        getFaceSetNames (dummy);
+        _loadFaceSetNames();
     }
 
     return (m_faceSets.find (iFaceSetName) != m_faceSets.end ());
@@ -174,12 +208,15 @@ IFaceSet
 IPolyMeshSchema::getFaceSet ( const std::string &iFaceSetName )
 {
     ALEMBIC_ABC_SAFE_CALL_BEGIN( "IPolyMeshSchema::getFaceSet()" );
-
+    boost::mutex::scoped_lock l(m_faceSetsMutex);
     if (!m_faceSetsLoaded)
     {
-        std::vector <std::string> dummy;
-        getFaceSetNames (dummy);
+        _loadFaceSetNames();
     }
+
+    ABCA_ASSERT( m_faceSets.find (iFaceSetName) != m_faceSets.end (),
+        "The requested FaceSet name can't be found in PolyMesh.");
+
     if (!m_faceSets [iFaceSetName])
     {
         // We haven't yet loaded the faceSet, so create/load it

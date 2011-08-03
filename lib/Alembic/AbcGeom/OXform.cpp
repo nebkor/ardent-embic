@@ -305,6 +305,25 @@ Abc::OCompoundProperty OXformSchema::getArbGeomParams()
 }
 
 //-*****************************************************************************
+Abc::OCompoundProperty OXformSchema::getUserProperties()
+{
+    ALEMBIC_ABC_SAFE_CALL_BEGIN( "OXformSchema::getUserProperties()" );
+
+    if ( ! m_userProperties )
+    {
+        m_userProperties = Abc::OCompoundProperty( this->getPtr(),
+                                                  ".userProperties" );
+    }
+
+    return m_userProperties;
+
+    ALEMBIC_ABC_SAFE_CALL_END();
+
+    Abc::OCompoundProperty ret;
+    return ret;
+}
+
+//-*****************************************************************************
 void OXformSchema::setTimeSampling( uint32_t iIndex )
 {
     ALEMBIC_ABC_SAFE_CALL_BEGIN(
