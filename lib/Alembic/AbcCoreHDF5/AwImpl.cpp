@@ -75,8 +75,14 @@ AwImpl::AwImpl( const std::string &iFileName,
     }
 
     // set the version using HDF5 native calls
+    // This expresses the AbcCoreHDF5 version - how properties,
+    // are stored within HDF5, etc.
     int version = ALEMBIC_HDF5_FILE_VERSION;
     H5LTset_attribute_int(m_file, ".", "abc_version", &version, 1);
+
+    int libraryVersion = ALEMBIC_LIBRARY_VERSION;
+    H5LTset_attribute_int(m_file, ".", "abc_release_version", 
+        &libraryVersion, 1);
 
     // Create top explicitly.
     m_top = new TopOwImpl( *this, m_file, m_metaData );

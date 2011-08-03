@@ -81,8 +81,6 @@ MStatus AbcExport::doIt(const MArgList & args)
 
     MArgParser argData(syntax(), args, &status);
 
-    unsigned int numberOfArguments = args.length();
-
     if (argData.isFlagSet("help"))
     {
         MGlobal::displayInfo(util::getHelpText());
@@ -462,7 +460,8 @@ MStatus AbcExport::doIt(const MArgList & args)
         if (hasRange)
         {
             transTime.reset(new AbcA::TimeSampling(AbcA::TimeSamplingType(
-                samples.size(), strideTime * util::spf()), samples));
+                static_cast<Alembic::Util::uint32_t>(samples.size()),
+                strideTime * util::spf()), samples));
         }
         else
         {
@@ -486,8 +485,7 @@ MStatus AbcExport::doIt(const MArgList & args)
         }
 
         AbcWriteJobPtr job(new AbcWriteJob(fileName.c_str(),
-            transSamples, transTime, geoSamples, geoTime,
-            jobArgs));
+            transSamples, transTime, geoSamples, geoTime, jobArgs));
 
        jobList.push_front(job);
 
@@ -589,11 +587,13 @@ MStatus AbcExport::doIt(const MArgList & args)
 }
 
 
+const char * AbcExportVersionString = "1.0";
 
 MStatus initializePlugin(MObject obj)
 {
     MStatus status;
-    MFnPlugin plugin(obj, "Alembic", "1.0", "Any");
+    MFnPlugin plugin(obj, "Alembic", AbcExportVersionString, "Any");
+
 
     status = plugin.registerCommand(
         "AbcExport", AbcExport::creator,
@@ -604,6 +604,18 @@ MStatus initializePlugin(MObject obj)
         status.perror("registerCommand");
     }
 
+
+    // Announce ourselves and our version.
+    MString aboutCommand = "about -version";
+    MString mayaVersion;
+    MGlobal::executeCommand (aboutCommand, mayaVersion, false, false);
+    std::ostringstream sversionString;
+    sversionString << "AbcExport plugin v" << AbcExportVersionString 
+        << " for Maya " << mayaVersion << " for " 
+        << AbcA::GetLibraryVersion ();
+    MString info;
+    info = sversionString.str ().c_str ();
+    MGlobal::displayInfo(info);
 
     return status;
 }

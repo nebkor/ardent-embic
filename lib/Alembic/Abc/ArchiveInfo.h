@@ -101,9 +101,6 @@ GetArchiveInfo(
     //! Extra information, could be arguments to the tool that wrote the file.
     std::string & oUserDescription );
 
-//! helper function which returns the version and date built in a string
-std::string GetLibraryVersion();
-
 //-*****************************************************************************
 //-*****************************************************************************
 template <class ARCHIVE_CTOR>
@@ -120,11 +117,11 @@ OArchive CreateArchiveWithInfo(
 
     md.set( kApplicationNameKey, iApplicationWriter );
 
-    Util::int32_t ver = ALEMBIC_API_VERSION;
+    Util::int32_t ver = ALEMBIC_LIBRARY_VERSION;
     std::stringstream strm;
     strm << ver;
     md.set( kAlembicApiVersionKey, strm.str() );
-    md.set( kAlembicVersionKey, GetLibraryVersion() );
+    md.set( kAlembicVersionKey, AbcA::GetLibraryVersion() );
 
     time_t rawtimeNow;
     time( &rawtimeNow );

@@ -64,14 +64,7 @@ GetArchiveInfo(
 
 std::string GetLibraryVersion()
 {
-    int ver = ALEMBIC_API_VERSION;
-
-    std::stringstream strm;
-    strm << ver/10000 << "." << (ver/100) - (ver / 10000 * 100) << "." <<
-        ver - (ver / 100 * 100) << " (built: " << __DATE__ << " "<<
-        __TIME__ << ")";
-
-    return strm.str();
+    return AbcA::GetLibraryVersion ();
 }
 
 } // End namespace Abc

@@ -34,54 +34,52 @@
 //
 //-*****************************************************************************
 
-#ifndef _AbcExport_MayaMeshWriter_h_
-#define _AbcExport_MayaMeshWriter_h_
+#include <string.h>
+#include <sstream>
+#include <time.h>
 
-#include "Foundation.h"
-#include "AttributesWriter.h"
-#include "MayaTransformWriter.h"
+#include <Alembic/AbcCoreAbstract/Foundation.h>
+#include <Alembic/AbcCoreAbstract/MetaData.h>
+#include <Alembic/AbcCoreAbstract/ArchiveWriter.h>
+#include <Alembic/AbcCoreAbstract/ArchiveReader.h>
 
-#include <Alembic/AbcGeom/OPolyMesh.h>
-#include <Alembic/AbcGeom/OSubD.h>
+namespace Alembic {
+namespace AbcCoreAbstract {
+namespace ALEMBIC_VERSION_NS {
 
-// Writes an MFnMesh as a poly mesh OR a subd mesh
-class MayaMeshWriter
+
+// 11/2/2010: Alembic 0.9      
+// 2/23/2011: Alembic 0.92 
+// 5/18/2011: Alembic 0.93    
+// 5/25/2011: Alembic 0.93b 
+// 6/29/2011: Alembic 1.0.rc1 
+// 8/8/2011:  Alembic 1.0.0 
+// This symbol's name gives a meaningful link / dlopen error
+// message to people if they mismatch plugins to library.
+const char *    kAlembicVersionStringALEMBIC_API_VERSION_1_0rc2 = "1.0.rc2";
+static const char * _kAlembicVersionString = 
+	kAlembicVersionStringALEMBIC_API_VERSION_1_0rc2;
+
+std::string 
+GetLibraryVersionShort()
 {
-  public:
+    std::string versionString (_kAlembicVersionString);
+    return versionString;
+}
 
-    MayaMeshWriter(MDagPath & iDag, Alembic::Abc::OObject & iParent,
-        Alembic::Util::uint32_t iTimeIndex, const JobArgs & iArgs);
-    void write();
-    bool isAnimated() const;
-    bool isSubD();
-    unsigned int getNumCVs();
-    unsigned int getNumFaces();
-    AttributesWriterPtr getAttrs() {return mAttrs;};
+std::string 
+GetLibraryVersion()
+{
+    // "Alembic 1.0.0 (7/6/2011)"
+    const char * date = __DATE__;
+    std::string   alembicVersion = GetLibraryVersionShort();
+    std::ostringstream sversionString;
+    sversionString << "Alembic " << alembicVersion 
+        << " (built " << date << ")";
+ 
+    return sversionString.str ();
+}
 
-  private:
-
-    void fillTopology(
-        std::vector<float> & oPoints,
-        std::vector<Alembic::Util::int32_t> & oFacePoints,
-        std::vector<Alembic::Util::int32_t> & oPointCounts);
-
-    void writePoly(const Alembic::AbcGeom::OV2fGeomParam::Sample & iUVs);
-
-    void writeSubD(const Alembic::AbcGeom::OV2fGeomParam::Sample & iUVs);
-
-    void getUVs(std::vector<float> & uvs,
-        std::vector<Alembic::Util::uint32_t> & indices);
-
-    void getPolyNormals(std::vector<float> & oNormals);
-    bool mNoNormals;
-    bool mWriteUVs;
-
-    bool    mIsGeometryAnimated;
-    MDagPath mDagPath;
-
-    AttributesWriterPtr mAttrs;
-    Alembic::AbcGeom::OPolyMeshSchema   mPolySchema;
-    Alembic::AbcGeom::OSubDSchema       mSubDSchema;
-};
-
-#endif  // _AbcExport_MayaMeshWriter_h_
+} // End namespace ALEMBIC_VERSION_NS
+} // End namespace AbcCoreAbstract
+} // End namespace Alembic
