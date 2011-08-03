@@ -37,16 +37,18 @@
 #ifndef _Alembic_AbcGeom_IPolyMesh_h_
 #define _Alembic_AbcGeom_IPolyMesh_h_
 
+#include <boost/thread/mutex.hpp>
 #include <Alembic/AbcGeom/Foundation.h>
 #include <Alembic/AbcGeom/SchemaInfoDeclarations.h>
 #include <Alembic/AbcGeom/IFaceSet.h>
 #include <Alembic/AbcGeom/IGeomParam.h>
+#include <Alembic/AbcGeom/IGeomBase.h>
 
 namespace Alembic {
 namespace AbcGeom {
 
 //-*****************************************************************************
-class IPolyMeshSchema : public Abc::ISchema<PolyMeshSchemaInfo>
+class IPolyMeshSchema : public IGeomBaseSchema<PolyMeshSchemaInfo>
 {
 public:
     class Sample
@@ -119,7 +121,7 @@ public:
 
                      const Abc::Argument &iArg0 = Abc::Argument(),
                      const Abc::Argument &iArg1 = Abc::Argument() )
-      : Abc::ISchema<PolyMeshSchemaInfo>( iParent, iName,
+      : IGeomBaseSchema<PolyMeshSchemaInfo>( iParent, iName,
                                             iArg0, iArg1 )
     {
         init( iArg0, iArg1 );
@@ -131,7 +133,7 @@ public:
     explicit IPolyMeshSchema( CPROP_PTR iParent,
                               const Abc::Argument &iArg0 = Abc::Argument(),
                               const Abc::Argument &iArg1 = Abc::Argument() )
-      : Abc::ISchema<PolyMeshSchemaInfo>( iParent,
+      : IGeomBaseSchema<PolyMeshSchemaInfo>( iParent,
                                             iArg0, iArg1 )
     {
         init( iArg0, iArg1 );
@@ -144,7 +146,7 @@ public:
 
                      const Abc::Argument &iArg0 = Abc::Argument(),
                      const Abc::Argument &iArg1 = Abc::Argument() )
-      : Abc::ISchema<PolyMeshSchemaInfo>( iThis, iFlag, iArg0, iArg1 )
+      : IGeomBaseSchema<PolyMeshSchemaInfo>( iThis, iFlag, iArg0, iArg1 )
     {
         init( iArg0, iArg1 );
     }
@@ -154,8 +156,7 @@ public:
     {
         *this = iCopy;
     }
-
-    //! Default assignment operator used.
+    const IPolyMeshSchema & operator=(const IPolyMeshSchema & rhs);
 
 
     //! Return the number of samples contained in the property.
@@ -220,16 +221,9 @@ public:
 
     IN3fGeomParam &getNormalsParam() { return m_normalsParam; }
 
-    // compound property to use as parent for any arbitrary GeomParams
-    // underneath it
-    ICompoundProperty getArbGeomParams() { return m_arbGeomParams; }
-
     Abc::IInt32ArrayProperty getFaceCountsProperty() { return m_countsProperty; }
     Abc::IInt32ArrayProperty getFaceIndicesProperty() { return m_indicesProperty; }
     Abc::IV3fArrayProperty getPositionsProperty() { return m_positionsProperty; }
-
-    Abc::IBox3dProperty getSelfBoundsProperty() { return m_selfBoundsProperty; }
-    Abc::IBox3dProperty getChildBoundsProperty() { return m_childBoundsProperty; }
 
     //-*************************************************************************
     // ABC BASE MECHANISMS
@@ -245,25 +239,17 @@ public:
         m_indicesProperty.reset();
         m_countsProperty.reset();
 
-        m_selfBoundsProperty.reset();
-        m_childBoundsProperty.reset();
-
         m_uvsParam.reset();
         m_normalsParam.reset();
 
-        m_arbGeomParams.reset();
-
-        m_faceSetsLoaded = false;
-        m_faceSets.clear();
-
-        Abc::ISchema<PolyMeshSchemaInfo>::reset();
+        IGeomBaseSchema<PolyMeshSchemaInfo>::reset();
     }
 
     //! Valid returns whether this function set is
     //! valid.
     bool valid() const
     {
-        return ( Abc::ISchema<PolyMeshSchemaInfo>::valid() &&
+        return ( IGeomBaseSchema<PolyMeshSchemaInfo>::valid() &&
                  m_positionsProperty.valid() &&
                  m_indicesProperty.valid() &&
                  m_countsProperty.valid() );
@@ -290,15 +276,12 @@ protected:
     IV2fGeomParam m_uvsParam;
     IN3fGeomParam m_normalsParam;
 
-    Abc::IBox3dProperty m_selfBoundsProperty;
-    Abc::IBox3dProperty m_childBoundsProperty;
-
-    Abc::ICompoundProperty m_arbGeomParams;
-
     // FaceSets, this starts as empty until client
     // code attempts to access facesets.
     bool                              m_faceSetsLoaded;
     std::map <std::string, IFaceSet>  m_faceSets;
+    boost::mutex                      m_faceSetsMutex;
+    void _loadFaceSetNames();
 };
 
 //-*****************************************************************************

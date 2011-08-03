@@ -41,6 +41,7 @@
 #include <Alembic/AbcGeom/SchemaInfoDeclarations.h>
 #include <Alembic/AbcGeom/OGeomParam.h>
 #include <Alembic/AbcGeom/FaceSetExclusivity.h>
+#include <Alembic/AbcGeom/OGeomBase.h>
 
 namespace Alembic {
 namespace AbcGeom {
@@ -52,7 +53,7 @@ class OSubDSchema;
 class OPolyMeshSchema;
 
 //-*****************************************************************************
-class OFaceSetSchema : public Abc::OSchema<FaceSetSchemaInfo>
+class OFaceSetSchema : public OGeomBaseSchema<FaceSetSchemaInfo>
 {
 public:
     //-*************************************************************************
@@ -146,7 +147,7 @@ public:
                      const Abc::Argument &iArg0 = Abc::Argument(),
                      const Abc::Argument &iArg1 = Abc::Argument(),
                      const Abc::Argument &iArg2 = Abc::Argument() )
-      : Abc::OSchema<FaceSetSchemaInfo>( iParentCompound, iName,
+      : OGeomBaseSchema<FaceSetSchemaInfo>( iParentCompound, iName,
                                    iArg0, iArg1, iArg2 )
     {
         _initTimeSampling ( iParentCompound, iArg0, iArg1, iArg2 );
@@ -180,7 +181,7 @@ public:
                               const Abc::Argument &iArg0 = Abc::Argument(),
                               const Abc::Argument &iArg1 = Abc::Argument(),
                               const Abc::Argument &iArg2 = Abc::Argument() )
-      : Abc::OSchema<FaceSetSchemaInfo>( iParentCompound,
+      : OGeomBaseSchema<FaceSetSchemaInfo>( iParentCompound,
                                             iArg0, iArg1, iArg2 )
     {
         _initTimeSampling ( iParentCompound, iArg0, iArg1, iArg2 );
@@ -217,6 +218,8 @@ public:
     //! gettable as indexed or not).
     Abc::OCompoundProperty getArbGeomParams();
 
+    Abc::OCompoundProperty getUserProperties();
+
     void setFaceExclusivity( FaceSetExclusivity iFacesExclusive );
     FaceSetExclusivity getFaceExclusivity() { return m_facesExclusive; }
     //-*************************************************************************
@@ -232,15 +235,14 @@ public:
         m_selfBoundsProperty.reset();
         m_childBoundsProperty.reset();
         m_facesProperty.reset();
-        m_arbGeomParams.reset();
 
-        Abc::OSchema<FaceSetSchemaInfo>::reset();
+        OGeomBaseSchema<FaceSetSchemaInfo>::reset();
     }
 
     //! Valid returns whether this instance holds real data.
     bool valid() const
     {
-        return ( Abc::OSchema<FaceSetSchemaInfo>::valid() &&
+        return ( OGeomBaseSchema<FaceSetSchemaInfo>::valid() &&
                  m_facesProperty.valid()
                  );
     }
@@ -256,13 +258,8 @@ protected:
 
     Abc::OInt32ArrayProperty    m_facesProperty;
 
-    Abc::OBox3dProperty         m_selfBoundsProperty;
-    Abc::OBox3dProperty         m_childBoundsProperty;
-
     Abc::OUInt32Property        m_facesExclusiveProperty;
     FaceSetExclusivity          m_facesExclusive;
-
-    Abc::OCompoundProperty      m_arbGeomParams;
 
     friend class OSubDSchema;
     friend class OPolyMeshSchema;

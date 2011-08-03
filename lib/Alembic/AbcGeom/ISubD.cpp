@@ -138,6 +138,38 @@ void ISubDSchema::get( ISubDSchema::Sample &oSample,
 }
 
 //-*****************************************************************************
+const ISubDSchema & 
+ISubDSchema::operator=(const ISubDSchema & rhs)
+{
+    IGeomBaseSchema<SubDSchemaInfo>::operator=(rhs);
+
+    // lock, reset
+    boost::mutex::scoped_lock l(m_faceSetsMutex);
+    m_faceSetsLoaded = false;
+    m_faceSets.clear ();
+
+    m_positionsProperty = rhs.m_positionsProperty;
+    m_faceIndicesProperty = rhs.m_faceIndicesProperty;
+    m_faceCountsProperty = rhs.m_faceCountsProperty;
+    m_faceVaryingInterpolateBoundaryProperty = 
+        rhs.m_faceVaryingInterpolateBoundaryProperty;
+    m_faceVaryingPropagateCornersProperty = 
+        rhs.m_faceVaryingPropagateCornersProperty;
+    m_interpolateBoundaryProperty = rhs.m_interpolateBoundaryProperty;
+    m_creaseIndicesProperty = rhs.m_creaseIndicesProperty;
+    m_creaseLengthsProperty = rhs.m_creaseLengthsProperty;
+    m_creaseSharpnessesProperty = rhs.m_creaseSharpnessesProperty;
+    m_cornerIndicesProperty = rhs.m_cornerIndicesProperty;
+    m_cornerSharpnessesProperty = rhs.m_cornerSharpnessesProperty;
+    m_holesProperty = rhs.m_holesProperty;
+    m_subdSchemeProperty = rhs.m_subdSchemeProperty;
+    m_uvsParam = rhs.m_uvsParam;
+    m_faceVaryingInterpolateBoundaryProperty = 
+        rhs.m_faceVaryingInterpolateBoundaryProperty;
+    return *this;
+}
+
+//-*****************************************************************************
 void ISubDSchema::init( const Abc::Argument &iArg0,
                         const Abc::Argument &iArg1 )
 {
@@ -211,24 +243,10 @@ void ISubDSchema::init( const Abc::Argument &iArg0,
     m_subdSchemeProperty = Abc::IStringProperty( _this, ".scheme",
                                          args.getSchemaInterpMatching() );
 
-    m_selfBoundsProperty = Abc::IBox3dProperty( _this, ".selfBnds", iArg0, iArg1 );
-
-    if ( this->getPropertyHeader(".childBnds") != NULL )
-    {
-        m_childBoundsProperty = Abc::IBox3dProperty( _this, ".childBnds", iArg0, iArg1);
-    }
-
     // none of the things below here are guaranteed to exist
     if ( this->getPropertyHeader( "uv" ) != NULL )
     {
         m_uvsParam = IV2fGeomParam( _this, "uv", iArg0, iArg1 );
-    }
-
-    if ( this->getPropertyHeader( ".arbGeomParams" ) != NULL )
-    {
-        m_arbGeomParams = Abc::ICompoundProperty( _this, ".arbGeomParams",
-                                                  args.getErrorHandlerPolicy()
-                                                );
     }
 
     m_faceSetsLoaded = false;
@@ -241,11 +259,31 @@ void ISubDSchema::getFaceSetNames (std::vector <std::string> & oFaceSetNames)
 {
     ALEMBIC_ABC_SAFE_CALL_BEGIN( "ISubDSchema::getFaceSetNames()" );
 
-    // iterate over childHeaders, and if header matches FaceSet add to our vec
-    IObject _thisObject = this->getParent().getObject();
+    boost::mutex::scoped_lock l(m_faceSetsMutex);
+    _loadFaceSetNames();
+
+    for (std::map<std::string, IFaceSet>::const_iterator faceSetIter =
+        m_faceSets.begin(); faceSetIter != m_faceSets.end(); ++faceSetIter)
+    {
+        oFaceSetNames.push_back( faceSetIter->first );
+    }
+
+    ALEMBIC_ABC_SAFE_CALL_END();
+}
+
+//-*****************************************************************************
+void ISubDSchema::_loadFaceSetNames()
+{
+    // Caller must ensure they have locked m_faceSetsMutex.
+    // (allows us to use non-recursive mutex)
+    ALEMBIC_ABC_SAFE_CALL_BEGIN( "ISubDSchema::_loadFaceSetNames()" );
 
     if (!m_faceSetsLoaded)
     {
+        // iterate over childHeaders, and if header matches 
+        // FaceSet add to our vec
+        IObject _thisObject = this->getParent().getObject();
+
         size_t numChildren = _thisObject.getNumChildren();
         for ( size_t childIndex = 0 ; childIndex < numChildren; childIndex++ )
         {
@@ -260,12 +298,6 @@ void ISubDSchema::getFaceSetNames (std::vector <std::string> & oFaceSetNames)
         m_faceSetsLoaded = true;
     }
 
-    for (std::map<std::string, IFaceSet>::const_iterator faceSetIter =
-        m_faceSets.begin(); faceSetIter != m_faceSets.end(); ++faceSetIter)
-    {
-        oFaceSetNames.push_back( faceSetIter->first );
-    }
-
     ALEMBIC_ABC_SAFE_CALL_END();
 }
 
@@ -275,10 +307,10 @@ ISubDSchema::hasFaceSet( const std::string &faceSetName )
 {
     ALEMBIC_ABC_SAFE_CALL_BEGIN( "ISubDSchema::hasFaceSet (faceSetName)" );
 
+    boost::mutex::scoped_lock l(m_faceSetsMutex);
     if (!m_faceSetsLoaded)
     {
-        std::vector <std::string> dummy;
-        getFaceSetNames (dummy);
+        _loadFaceSetNames();
     }
 
     return (m_faceSets.find (faceSetName) != m_faceSets.end ());
@@ -292,17 +324,16 @@ ISubDSchema::hasFaceSet( const std::string &faceSetName )
 IFaceSet
 ISubDSchema::getFaceSet( const std::string &iFaceSetName )
 {
-
     ALEMBIC_ABC_SAFE_CALL_BEGIN( "ISubDSchema::getFaceSet()" );
-
-    ABCA_ASSERT( this->hasFaceSet (iFaceSetName),
-        "The requested FaceSet name can't be found in SubD.");
-
+    boost::mutex::scoped_lock l(m_faceSetsMutex);
     if (!m_faceSetsLoaded)
     {
-        std::vector <std::string> dummy;
-        this->getFaceSetNames (dummy);
+        _loadFaceSetNames();
     }
+
+    ABCA_ASSERT( m_faceSets.find (iFaceSetName) != m_faceSets.end (),
+        "The requested FaceSet name can't be found in SubD.");
+
     if (!m_faceSets [iFaceSetName])
     {
         // We haven't yet loaded the faceSet, so create/load it
