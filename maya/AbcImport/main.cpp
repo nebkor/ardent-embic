@@ -36,15 +36,19 @@
 
 #include <maya/MFnPlugin.h>
 #include <maya/MObject.h>
+#include <maya/MGlobal.h>
 
 #include "AlembicNode.h"
 #include "AbcImport.h"
 
 const MTypeId AlembicNode::mMayaNodeId(0x00082697);
 
+namespace AbcA = Alembic::AbcCoreAbstract;
+
 MStatus initializePlugin(MObject obj)
 {
-    MFnPlugin plugin(obj, "Sony Pictures Imageworks", "1.0", "Any");
+    const char * pluginVersion = "1.0";
+    MFnPlugin plugin(obj, "Alembic", pluginVersion, "Any");
 
     MStatus status = plugin.registerCommand("AbcImport",
                                 AbcImport::creator,
@@ -54,6 +58,17 @@ MStatus initializePlugin(MObject obj)
                                 AlembicNode::mMayaNodeId,
                                 &AlembicNode::creator,
                                 &AlembicNode::initialize);
+
+    // Announce ourselves and our version.
+    MString aboutCommand = "about -version";
+    MString mayaVersion;
+    MGlobal::executeCommand (aboutCommand, mayaVersion, false, false);
+    std::ostringstream sversionString;
+    sversionString << "AbcImport plugin v" << pluginVersion << " for Maya " <<
+        mayaVersion << " for " << AbcA::GetLibraryVersion ();
+    MString info;
+    info = sversionString.str ().c_str ();
+    MGlobal::displayInfo(info);
 
     return status;
 }

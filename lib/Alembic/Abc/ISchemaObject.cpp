@@ -45,7 +45,7 @@ namespace Abc {
 namespace {
 
 // Declare a test schema.
-ALEMBIC_ABC_DECLARE_SCHEMA_INFO( "TestSchema_v1", ".test",
+ALEMBIC_ABC_DECLARE_SCHEMA_INFO( "TestSchema_v1", "", ".test",
                                    TestSchemaInfo );
 
 typedef ISchema<TestSchemaInfo> ITestSchema;
@@ -64,6 +64,7 @@ void __test( IObject &iParent )
                 kStrictMatching );
 
     ITestSchema& schm = tst4.getSchema();
+    schm.valid();
 }
 
 } // End anonymous namespace

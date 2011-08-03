@@ -183,7 +183,7 @@ void MayaNurbsCurveWriter::write()
         width.push_back(constWidthPlug.asFloat());
     }
 
-    for (size_t i = 0; i < numCurves; i++)
+    for (std::size_t i = 0; i < numCurves; i++)
     {
         MFnNurbsCurve curve;
         if (mIsCurveGrp)
@@ -222,7 +222,7 @@ void MayaNurbsCurveWriter::write()
 
         MPointArray cvArray;
         stat = curve.getCVs(cvArray, MSpace::kObject);
-        for (size_t j = 0; j < numCVs; j++)
+        for (Alembic::Util::int32_t j = 0; j < numCVs; j++)
         {
             MPoint transformdPt;
             if (mIsCurveGrp)
@@ -230,9 +230,9 @@ void MayaNurbsCurveWriter::write()
             else
                 transformdPt = cvArray[j];
 
-            points.push_back(transformdPt.x);
-            points.push_back(transformdPt.y);
-            points.push_back(transformdPt.z);
+            points.push_back(static_cast<float>(transformdPt.x));
+            points.push_back(static_cast<float>(transformdPt.y));
+            points.push_back(static_cast<float>(transformdPt.z));
         }
 
         // width
@@ -244,12 +244,12 @@ void MayaNurbsCurveWriter::write()
             MStatus status = widthPlug.getValue(widthObj);
             MFnDoubleArrayData fnDoubleArrayData(widthObj, &status);
             MDoubleArray doubleArrayData = fnDoubleArrayData.array();
-            size_t arraySum = doubleArrayData.length();
+            Alembic::Util::int32_t arraySum = doubleArrayData.length();
             if (arraySum == numCVs)
             {
-                for (size_t i = 0; i < arraySum; i++)
+                for (Alembic::Util::int32_t i = 0; i < arraySum; i++)
                 {
-                    width.push_back(doubleArrayData[i]);
+                    width.push_back(static_cast<float>(doubleArrayData[i]));
                 }
             }
             else if (status == MS::kSuccess)
@@ -261,7 +261,7 @@ void MayaNurbsCurveWriter::write()
                 MGlobal::displayWarning(msg);
 
                 width.clear();
-                width.push_back(0.1);
+                width.push_back(0.1f);
                 useConstWidth = true;
             }
             else
@@ -274,7 +274,7 @@ void MayaNurbsCurveWriter::write()
         {
             // pick a default value
             width.clear();
-            width.push_back(0.1);
+            width.push_back(0.1f);
             useConstWidth = true;
         }
     }

@@ -164,6 +164,43 @@ int main( int argc, char *argv[] )
     {
         IArchive archive( Alembic::AbcCoreHDF5::ReadArchive(),
                           argv[1], ErrorHandler::kQuietNoopPolicy );
+        if (archive)
+        {
+            std::cout  << "AbcEcho for " 
+                       << Alembic::AbcCoreAbstract::GetLibraryVersion ()
+                       << std::endl;;
+        
+            std::string appName;
+            std::string writerVersion;
+            std::string alembicVersion;
+            std::string whenWritten;
+            std::string userDescription;
+            Alembic::AbcCoreAbstract::GetArchiveInfo (archive.getPtr(),
+                            appName,
+                            writerVersion,
+                            alembicVersion,
+                            whenWritten,
+                            userDescription);
+            if (appName != "")
+            {
+                std::cout << argv[1] << std::endl;
+                std::cout << "  file written by: " << appName << "  version " 
+                          << writerVersion << std::endl;
+                std::cout << "  using Alembic : " << alembicVersion 
+                          << std::endl;
+                std::cout << "  written on : " << whenWritten << std::endl;
+                std::cout << "  user description : " 
+                          << userDescription << std::endl;
+                std::cout << std::endl;
+            }
+            else
+            {
+                std::cout << argv[1] << std::endl;
+                std::cout << "  (file doesn't have any ArchiveInfo)" 
+                          << std::endl;
+                std::cout << std::endl;
+            }
+        }
         visitObject( archive.getTop(), "" );
     }
 
