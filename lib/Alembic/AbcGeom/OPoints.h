@@ -248,10 +248,6 @@ public:
     void setTimeSampling( uint32_t iIndex );
     void setTimeSampling( AbcA::TimeSamplingPtr iTime );
 
-    //! A container for arbitrary geom params (pseudo-properties settable and
-    //! gettable as indexed or not).
-    Abc::OCompoundProperty getArbGeomParams();
-
     //-*************************************************************************
     // ABC BASE MECHANISMS
     // These functions are used by Abc to deal with errors, rewrapping,

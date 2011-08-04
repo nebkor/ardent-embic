@@ -214,12 +214,6 @@ public:
     void setTimeSampling( uint32_t iTimeSamplingID );
     void setTimeSampling( AbcA::TimeSamplingPtr iTime );
 
-    //! A container for arbitrary geom params (pseudo-properties settable and
-    //! gettable as indexed or not).
-    Abc::OCompoundProperty getArbGeomParams();
-
-    Abc::OCompoundProperty getUserProperties();
-
     void setFaceExclusivity( FaceSetExclusivity iFacesExclusive );
     FaceSetExclusivity getFaceExclusivity() { return m_facesExclusive; }
     //-*************************************************************************

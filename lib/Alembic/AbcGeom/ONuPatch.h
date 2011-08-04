@@ -103,7 +103,7 @@ public:
         { m_positions = iSmp; }
 
         // position weights, if it isn't set, it's 1 for every point
-        const Abc::FloatArraySample &getPositionWeights() const 
+        const Abc::FloatArraySample &getPositionWeights() const
         { return m_positionWeights; }
         void setPositionWeights( const Abc::FloatArraySample &iSmp )
         { m_positionWeights = iSmp; }
@@ -376,8 +376,6 @@ public:
     //! Set from previous sample. Will apply to each of positions,
     //! indices, and counts.
     void setFromPrevious();
-
-    Abc::OCompoundProperty getArbGeomParams();
 
     //-*************************************************************************
     // ABC BASE MECHANISMS

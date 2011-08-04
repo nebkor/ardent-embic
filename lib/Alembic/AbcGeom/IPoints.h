@@ -202,8 +202,6 @@ public:
         return smp;
     }
 
-    Abc::ICompoundProperty getArbGeomParams() { return m_arbGeomParams; }
-
     Abc::IV3fArrayProperty getPositionsProperty()
     {
         return m_positionsProperty;
