@@ -587,9 +587,6 @@ void testBadTypes()
 //-*****************************************************************************
 int main( int, char** )
 {
-    // make sure somebody didn't mess up the ALEMBIC_API_VERSION
-    TESTING_ASSERT(ALEMBIC_API_VERSION > 9999 &&
-        ALEMBIC_API_VERSION < 999999);
 
     // cyclic is trickiest
     testCyclicTime1();
