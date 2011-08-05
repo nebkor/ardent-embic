@@ -561,7 +561,7 @@ typedef ITypedGeomParam<N2dTPTraits>             IN2dGeomParam;
 typedef ITypedGeomParam<N3fTPTraits>             IN3fGeomParam;
 typedef ITypedGeomParam<N3dTPTraits>             IN3dGeomParam;
 
-} // namespace AbcGeom
+} // End namespace AbcGeom
 } // namespace Alembic
 
 #endif

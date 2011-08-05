@@ -52,7 +52,7 @@ enum CurveType {
   kLinear = 1
 };
 
-}
+} // End namespace AbcGeom
 }
 
 #endif

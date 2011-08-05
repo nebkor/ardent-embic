@@ -161,7 +161,7 @@ ALEMBIC_ABCGEOM_DECLARE_SCHEMA_INFO( "AbcGeom_GeomBase_v1",
 
 #define ALEMBIC_ABCGEOM_CURVE_SCHEMA (CurvesSchemaInfo::title())
 
-}
+} // End namespace AbcGeom
 }
 
 

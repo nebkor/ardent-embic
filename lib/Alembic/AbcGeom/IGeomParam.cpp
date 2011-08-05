@@ -47,5 +47,5 @@ static void __testIGeomParamCompile( Abc::ICompoundProperty &iParent )
 }
 
 
-}
+} // End namespace AbcGeom
 }
