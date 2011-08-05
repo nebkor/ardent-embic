@@ -144,11 +144,6 @@ ISubDSchema::operator=(const ISubDSchema & rhs)
 {
     IGeomBaseSchema<SubDSchemaInfo>::operator=(rhs);
 
-    // lock, reset
-    boost::mutex::scoped_lock l(m_faceSetsMutex);
-    m_faceSetsLoaded = false;
-    m_faceSets.clear ();
-
     m_positionsProperty = rhs.m_positionsProperty;
     m_faceIndicesProperty = rhs.m_faceIndicesProperty;
     m_faceCountsProperty = rhs.m_faceCountsProperty;
@@ -167,6 +162,11 @@ ISubDSchema::operator=(const ISubDSchema & rhs)
     m_uvsParam = rhs.m_uvsParam;
     m_faceVaryingInterpolateBoundaryProperty = 
         rhs.m_faceVaryingInterpolateBoundaryProperty;
+
+    // lock, reset
+    boost::mutex::scoped_lock l(m_faceSetsMutex);
+    m_faceSetsLoaded = false;
+    m_faceSets.clear();
     return *this;
 }
 
@@ -182,8 +182,8 @@ void ISubDSchema::init( const Abc::Argument &iArg0,
 
     AbcA::CompoundPropertyReaderPtr _this = this->getPtr();
 
-    m_positionsProperty = Abc::IV3fArrayProperty( _this, "P",
-                                          args.getSchemaInterpMatching() );
+    // no matching so we pick up old assets written as V3f
+    m_positionsProperty = Abc::IP3fArrayProperty( _this, "P", kNoMatching );
     m_faceIndicesProperty = Abc::IInt32ArrayProperty( _this, ".faceIndices",
                                             args.getSchemaInterpMatching() );
     m_faceCountsProperty = Abc::IInt32ArrayProperty( _this, ".faceCounts",
@@ -261,7 +261,7 @@ void ISubDSchema::getFaceSetNames (std::vector <std::string> & oFaceSetNames)
     ALEMBIC_ABC_SAFE_CALL_BEGIN( "ISubDSchema::getFaceSetNames()" );
 
     boost::mutex::scoped_lock l(m_faceSetsMutex);
-    _loadFaceSetNames();
+    loadFaceSetNames();
 
     for (std::map<std::string, IFaceSet>::const_iterator faceSetIter =
         m_faceSets.begin(); faceSetIter != m_faceSets.end(); ++faceSetIter)
@@ -273,11 +273,11 @@ void ISubDSchema::getFaceSetNames (std::vector <std::string> & oFaceSetNames)
 }
 
 //-*****************************************************************************
-void ISubDSchema::_loadFaceSetNames()
+void ISubDSchema::loadFaceSetNames()
 {
     // Caller must ensure they have locked m_faceSetsMutex.
     // (allows us to use non-recursive mutex)
-    ALEMBIC_ABC_SAFE_CALL_BEGIN( "ISubDSchema::_loadFaceSetNames()" );
+    ALEMBIC_ABC_SAFE_CALL_BEGIN( "ISubDSchema::loadFaceSetNames()" );
 
     if (!m_faceSetsLoaded)
     {
@@ -311,7 +311,7 @@ ISubDSchema::hasFaceSet( const std::string &faceSetName )
     boost::mutex::scoped_lock l(m_faceSetsMutex);
     if (!m_faceSetsLoaded)
     {
-        _loadFaceSetNames();
+        loadFaceSetNames();
     }
 
     return (m_faceSets.find (faceSetName) != m_faceSets.end ());
@@ -329,7 +329,7 @@ ISubDSchema::getFaceSet( const std::string &iFaceSetName )
     boost::mutex::scoped_lock l(m_faceSetsMutex);
     if (!m_faceSetsLoaded)
     {
-        _loadFaceSetNames();
+        loadFaceSetNames();
     }
 
     ABCA_ASSERT( m_faceSets.find (iFaceSetName) != m_faceSets.end (),

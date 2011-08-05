@@ -93,6 +93,7 @@ void IFaceSetSchema::get( IFaceSetSchema::Sample &oSample,
 void IFaceSetSchema::init( const Abc::Argument &iArg0,
                         const Abc::Argument &iArg1 )
 {
+    // Only callable by ctors (mt-safety)
     ALEMBIC_ABC_SAFE_CALL_BEGIN( "IFaceSetSchema::init()" );
 
     Abc::Arguments args;

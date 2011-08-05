@@ -52,7 +52,7 @@ namespace ALEMBIC_VERSION_NS {
 //! - GeomParams (optional)
 //! - UserProperties (optional)
 //!
-//! This class is used to encapsulate common functionality of the 
+//! This class is used to encapsulate common functionality of the
 //! real Geometry schema classes, like OPoints and OPolyMesh and so on
 template <class INFO>
 class OGeomBaseSchema : public Abc::OSchema<INFO>
@@ -79,20 +79,19 @@ public:
     template <class CPROP_PTR>
     OGeomBaseSchema( CPROP_PTR iParentCompound,
              const std::string &iName,
-
              const Argument &iArg0 = Argument(),
              const Argument &iArg1 = Argument(),
              const Argument &iArg2 = Argument() )
-       : OSchema<info_type>( iParentCompound, iName,
-                             iArg0, iArg1, iArg2 )
+       : OSchema<info_type>( iParentCompound, iName, iArg0, iArg1, iArg2 )
     {
         AbcA::TimeSamplingPtr tsPtr =
             Abc::GetTimeSampling( iArg0, iArg1, iArg2 );
         uint32_t tsIndex =
             Abc::GetTimeSamplingIndex( iArg0, iArg1, iArg2 );
+
         // if we specified a valid TimeSamplingPtr, use it to determine the
         // index otherwise use the default index of 0 - uniform.
-        if (tsPtr)
+        if ( tsPtr )
         {
             tsIndex = iParentCompound->getObject()->getArchive(
                 )->addTimeSampling(*tsPtr);
@@ -104,12 +103,10 @@ public:
 
     template <class CPROP_PTR>
     explicit OGeomBaseSchema( CPROP_PTR iParentCompound,
-
                       const Argument &iArg0 = Argument(),
                       const Argument &iArg1 = Argument(),
                       const Argument &iArg2 = Argument() )
-      : OSchema<info_type>( iParentCompound,
-                            iArg0, iArg1, iArg2 )
+      : OSchema<info_type>( iParentCompound, iArg0, iArg1, iArg2 )
     {
         AbcA::TimeSamplingPtr tsPtr =
             Abc::GetTimeSampling( iArg0, iArg1, iArg2 );
@@ -119,7 +116,7 @@ public:
         // if we specified a valid TimeSamplingPtr, use it to determine the
         // index otherwise we'll use the index, which defaults to the intrinsic
         // 0 index
-        if (tsPtr)
+        if ( tsPtr )
         {
             tsIndex = iParentCompound->getObject()->getArchive(
                 )->addTimeSampling(*tsPtr);
@@ -137,9 +134,9 @@ public:
 
         AbcA::CompoundPropertyWriterPtr _this = this->getPtr();
 
-        // Create our always present property. All other 
+        // Create our always present property. All other
         // properties are optional.
-        m_selfBoundsProperty = Abc::OBox3dProperty( _this, 
+        m_selfBoundsProperty = Abc::OBox3dProperty( _this,
                                                     ".selfBnds", iTsHandle );
 
         ALEMBIC_ABC_SAFE_CALL_END_RESET();
@@ -190,7 +187,7 @@ public:
         if ( ! m_userProperties )
         {
             m_userProperties = Abc::OCompoundProperty( this->getPtr(),
-                                                      ".userProperties" );
+                                                       ".userProperties" );
         }
 
         return m_userProperties;

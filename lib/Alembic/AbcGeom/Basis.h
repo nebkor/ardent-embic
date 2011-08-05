@@ -61,6 +61,6 @@ int GetStepFromBasisType(const BasisType basis );
 using namespace ALEMBIC_VERSION_NS;
 
 } // End namespace AbcGeom
-}
+} // End namespace Alembic
 
 #endif

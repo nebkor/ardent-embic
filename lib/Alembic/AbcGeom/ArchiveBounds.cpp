@@ -1,7 +1,7 @@
 //-*****************************************************************************
 //
 // Copyright (c) 2009-2011,
-//  Sony Pictures Imageworks Inc. and
+//  Sony Pictures Imageworks, Inc. and
 //  Industrial Light & Magic, a division of Lucasfilm Entertainment Company Ltd.
 //
 // All rights reserved.
@@ -16,7 +16,7 @@
 // in the documentation and/or other materials provided with the
 // distribution.
 // *       Neither the name of Sony Pictures Imageworks, nor
-// Industrial Light & Magic, nor the names of their contributors may be used
+// Industrial Light & Magic nor the names of their contributors may be used
 // to endorse or promote products derived from this software without specific
 // prior written permission.
 //
@@ -34,45 +34,33 @@
 //
 //-*****************************************************************************
 
-#ifndef _Alembic_GLUtil_GLEWInit_h_
-#define _Alembic_GLUtil_GLEWInit_h_
-
-#ifndef PLATFORM_DARWIN
-
-#include <Alembic/GLUtil/Foundation.h>
+#include <Alembic/AbcGeom/ArchiveBounds.h>
 
 namespace Alembic {
-namespace GLUtil {
+namespace AbcGeom {
+namespace ALEMBIC_VERSION_NS {
 
-#ifdef ALEMBIC_GLEW_MX
-
-//-*****************************************************************************
-// This maps GL contexts to GLEW contexts.
-class GLEWContextMap 
+Abc::IBox3dProperty GetIArchiveBounds( IArchive & iArchive,
+                                       const Argument &iArg0,
+                                       const Argument &iArg1 )
 {
-public:
-    typedef GLXEWContext PlatformContext;
-    
-    static GLEWContext*     getContext() { return m_current; }
-    static PlatformContext* getPlatformContext() { return m_currentPlatform; }
-    static void             postCreateGLContext( void* glContext );
-    static void             preDestroyGLContext( void* glContext );
-    static void             postMakeCurrent( void* glContext );
 
-private:
-    static GLEWContext*     m_current;
-    static PlatformContext* m_currentPlatform;
-};
+    return Alembic::Abc::IBox3dProperty( iArchive.getTop().getProperties(),
+                                         ".childBnds", iArg0, iArg1 );
 
-#endif
+}
 
-//-*****************************************************************************
-// Simple GLEW init for our purposes.
-void GLEWInit();
+Abc::OBox3dProperty CreateOArchiveBounds( OArchive & iArchive,
+                                          const Argument &iArg0,
+                                          const Argument &iArg1,
+                                          const Argument &iArg2 )
+{
 
-} // End namespace GLUtil
+    return Alembic::Abc::OBox3dProperty( iArchive.getTop().getProperties(),
+                                         ".childBnds", iArg0, iArg1, iArg2 );
+
+}
+
+} // End namespace ALEMBIC_VERSION_NS
+} // End namespace AbcGeom
 } // End namespace Alembic
-
-#endif // PLATFORM_DAWIN
-
-#endif // _Alembic_GLUtil_GLEWInit_h_

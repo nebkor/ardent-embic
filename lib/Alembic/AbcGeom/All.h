@@ -37,7 +37,9 @@
 #ifndef _Alembic_AbcGeom_All_h_
 #define _Alembic_AbcGeom_All_h_
 
-#include <Alembic/AbcGeom/Foundation.h>
+#include <Alembic/AbcGeom/ArchiveBounds.h>
+
+#include <Alembic/AbcGeom/GeometryScope.h>
 
 #include <Alembic/AbcGeom/GeometryScope.h>
 

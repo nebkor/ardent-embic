@@ -47,14 +47,14 @@ namespace AbcGeom {
 namespace ALEMBIC_VERSION_NS {
 
 
-//! This class holds properties common to all geometric classes
-//! that have a physical volume.
+//! This class holds properties common to all geometric classes that have a
+//! physical volume.
 //! - selfBounds
 //! - childBounds (optional)
 //! - GeomParams (optional)
 //! - UserProperties (optional)
 //!
-//! This class encapsulates common functionality of the 
+//! This class is used to encapsulate common functionality of the 
 //! real Geometry schema classes, like IPoints and IPolyMesh and so on
 template <class INFO>
 class IGeomBaseSchema : public Abc::ISchema<INFO>
@@ -122,11 +122,11 @@ public:
 
         AbcA::CompoundPropertyReaderPtr _this = this->getPtr();
 
-        m_selfBoundsProperty = Abc::IBox3dProperty( _this, ".selfBnds", 
+        m_selfBoundsProperty = Abc::IBox3dProperty( _this, ".selfBnds",
             iArg0, iArg1 );
         if ( this->getPropertyHeader( ".childBnds" ) != NULL )
         {
-            m_childBoundsProperty = Abc::IBox3dProperty( _this, 
+            m_childBoundsProperty = Abc::IBox3dProperty( _this,
                 ".childBnds", iArg0, iArg1 );
         }
 
@@ -202,7 +202,7 @@ protected:
 //! just wish to iterate through an archive's hierarchy to examine bounding
 //! regions this class could be helpful to you. Then when you actually
 //! need to access the real data in the geometric type you can
-//! always create the needed type of I<geom type> object via kWrapExisting.
+//! always create the needed type of I<geom type> object> via kWrapExisting.
 class IGeomBase : public IGeomBaseSchema<GeomBaseSchemaInfo>
 {
 public:
@@ -243,16 +243,16 @@ public:
 
     template <class CPROP_PTR>
     IGeomBase( CPROP_PTR iParent,
-                   const std::string &iName,
-                   const Abc::Argument &iArg0 = Abc::Argument(),
-                   const Abc::Argument &iArg1 = Abc::Argument() )
-                   
+               const std::string &iName,
+               const Abc::Argument &iArg0 = Abc::Argument(),
+               const Abc::Argument &iArg1 = Abc::Argument() )
+
         // We don't want strict matching of the title because the real schema
         // is going to be something like "AbcGeom_<type>_vX"
       : IGeomBaseSchema<GeomBaseSchemaInfo>( iParent, iName,
-                                          kNoMatching, iArg0 )
+                                             kNoMatching, iArg0 )
     {
-        init( iArg0, Abc::Argument () );
+        init( iArg0, iArg1 );
     }
 
     template <class CPROP_PTR>
@@ -261,10 +261,9 @@ public:
                         const Abc::Argument &iArg1 = Abc::Argument() )
         // We don't want strict matching of the title because the real schema
         // is going to be something like "AbcGeom_<type>_vX"
-      : IGeomBaseSchema<GeomBaseSchemaInfo>( iThis,
-                                     iArg0, kNoMatching )
+      : IGeomBaseSchema<GeomBaseSchemaInfo>( iThis, iArg0, kNoMatching )
     {
-        init( iArg0, Abc::Argument () );
+        init( iArg0, iArg1 );
     }
 
     template <class CPROP_PTR>
@@ -274,15 +273,14 @@ public:
                         const Abc::Argument &iArg1 = Abc::Argument() )
         // We don't want strict matching of the title because the real schema
         // is going to be something like "AbcGeom_<type>_vX"
-      : IGeomBaseSchema<GeomBaseSchemaInfo>( iThis,
-                                     iFlag,
-                                     kNoMatching )
+      : IGeomBaseSchema<GeomBaseSchemaInfo>( iThis, iFlag, kNoMatching )
     {
-        init( iArg0, Abc::Argument () );
+        init( iArg0, iArg1 );
     }
 
     //! Copy constructor.
     IGeomBase(const IGeomBase & iCopy)
+        : IGeomBaseSchema<GeomBaseSchemaInfo>()
     {
         *this = iCopy;
     }
@@ -325,8 +323,8 @@ public:
 
         if ( m_childBoundsProperty && 
              m_childBoundsProperty.getNumSamples() > 0 )
-        { 
-            m_childBoundsProperty.get( oSample.m_childBounds, iSS ); 
+        {
+            m_childBoundsProperty.get( oSample.m_childBounds, iSS );
         }
 
         ALEMBIC_ABC_SAFE_CALL_END();
@@ -379,7 +377,7 @@ public:
 
         if ( iMatching == kStrictMatching || iMatching == kSchemaTitleMatching )
         {
-            return iMetaData.get( "schemaBaseType" ) == 
+            return iMetaData.get( "schemaBaseType" ) ==
                 GeomBaseSchemaInfo::title();
         }
 
@@ -395,8 +393,6 @@ public:
     {
         return matches( iHeader.getMetaData(), iMatching );
     }
-
-
 
 protected:
 };

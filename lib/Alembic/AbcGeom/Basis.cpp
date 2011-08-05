@@ -92,4 +92,4 @@ int GetStepFromBasisType( const BasisType basis )
 
 } // End namespace ALEMBIC_VERSION_NS
 } // End namespace AbcGeom
-}
+} // End namespace Alembic

@@ -64,7 +64,7 @@ public:
         Sample() { reset(); }
 
         // main stuff
-        Abc::V3fArraySamplePtr getPositions() const { return m_positions; }
+        Abc::P3fArraySamplePtr getPositions() const { return m_positions; }
         Abc::Int32ArraySamplePtr getFaceIndices() const { return m_faceIndices; }
         Abc::Int32ArraySamplePtr getFaceCounts() const { return m_faceCounts; }
 
@@ -142,7 +142,7 @@ public:
     protected:
         friend class ISubDSchema;
 
-        Abc::V3fArraySamplePtr m_positions;
+        Abc::P3fArraySamplePtr m_positions;
         Abc::Int32ArraySamplePtr m_faceIndices;
         Abc::Int32ArraySamplePtr m_faceCounts;
 
@@ -274,11 +274,11 @@ public:
         return smp;
     }
 
-    Abc::IInt32ArrayProperty getFaceCountsProperty() 
+    Abc::IInt32ArrayProperty getFaceCountsProperty()
     { return m_faceCountsProperty; }
-    Abc::IInt32ArrayProperty getFaceIndicesProperty() 
+    Abc::IInt32ArrayProperty getFaceIndicesProperty()
     { return m_faceIndicesProperty; }
-    Abc::IV3fArrayProperty getPositionsProperty() 
+    Abc::IP3fArrayProperty getPositionsProperty()
     { return m_positionsProperty; }
 
     Abc::IInt32Property getFaceVaryingInterpolateBoundaryProperty()
@@ -290,14 +290,14 @@ public:
     Abc::IInt32Property getInterpolateBoundaryProperty()
     { return m_interpolateBoundaryProperty; }
 
-    Abc::IInt32ArrayProperty getCreaseIndicesProperty() 
+    Abc::IInt32ArrayProperty getCreaseIndicesProperty()
     { return m_creaseIndicesProperty; }
-    Abc::IInt32ArrayProperty getCreaseLengthsProperty() 
+    Abc::IInt32ArrayProperty getCreaseLengthsProperty()
     { return m_creaseLengthsProperty; }
     Abc::IFloatArrayProperty getCreaseSharpnessesProperty()
     { return m_creaseSharpnessesProperty; }
 
-    Abc::IInt32ArrayProperty getCornerIndicesProperty() 
+    Abc::IInt32ArrayProperty getCornerIndicesProperty()
     { return m_cornerIndicesProperty; }
     Abc::IFloatArrayProperty getCornerSharpnessesProperty()
     { return m_cornerSharpnessesProperty; }
@@ -365,6 +365,7 @@ public:
 
     // Copy constructors
     ISubDSchema(const ISubDSchema& iCopy)
+        : IGeomBaseSchema<SubDSchemaInfo>()
     {
         *this = iCopy;
     }
@@ -373,7 +374,7 @@ public:
 protected:
     void init( const Abc::Argument &iArg0, const Abc::Argument &iArg1 );
 
-    Abc::IV3fArrayProperty m_positionsProperty;
+    Abc::IP3fArrayProperty   m_positionsProperty;
     Abc::IInt32ArrayProperty m_faceIndicesProperty;
     Abc::IInt32ArrayProperty m_faceCountsProperty;
 
@@ -383,19 +384,19 @@ protected:
     Abc::IInt32Property m_interpolateBoundaryProperty;
 
     // Creases
-    Abc::IInt32ArrayProperty    m_creaseIndicesProperty;
-    Abc::IInt32ArrayProperty    m_creaseLengthsProperty;
+    Abc::IInt32ArrayProperty  m_creaseIndicesProperty;
+    Abc::IInt32ArrayProperty  m_creaseLengthsProperty;
     Abc::IFloatArrayProperty  m_creaseSharpnessesProperty;
 
     // Corners
-    Abc::IInt32ArrayProperty    m_cornerIndicesProperty;
+    Abc::IInt32ArrayProperty  m_cornerIndicesProperty;
     Abc::IFloatArrayProperty  m_cornerSharpnessesProperty;
 
     // Holes
-    Abc::IInt32ArrayProperty    m_holesProperty;
+    Abc::IInt32ArrayProperty  m_holesProperty;
 
     // subdivision scheme
-    Abc::IStringProperty m_subdSchemeProperty;
+    Abc::IStringProperty      m_subdSchemeProperty;
 
     // UVs
     IV2fGeomParam m_uvsParam;
@@ -405,7 +406,7 @@ protected:
     bool                              m_faceSetsLoaded;
     std::map <std::string, IFaceSet>  m_faceSets;
     boost::mutex                      m_faceSetsMutex;
-    void _loadFaceSetNames();
+    void loadFaceSetNames();
 
 };
 
