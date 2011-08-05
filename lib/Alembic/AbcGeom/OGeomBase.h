@@ -43,6 +43,7 @@
 
 namespace Alembic {
 namespace AbcGeom {
+namespace ALEMBIC_VERSION_NS {
 
 
 //! This class holds properties common to all classes with a physical volume.
@@ -210,6 +211,10 @@ protected:
 
 };
 
+
+} // End namespace ALEMBIC_VERSION_NS
+
+using namespace ALEMBIC_VERSION_NS;
 
 } // End namespace AbcGeom
 } // End namespace Alembic

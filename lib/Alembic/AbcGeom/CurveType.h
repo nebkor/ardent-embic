@@ -41,6 +41,7 @@
 
 namespace Alembic {
 namespace AbcGeom {
+namespace ALEMBIC_VERSION_NS {
 
 enum CurvePeriodicity {
   kNonPeriodic = 0,
@@ -51,6 +52,10 @@ enum CurveType {
   kCubic = 0,
   kLinear = 1
 };
+
+} // End namespace ALEMBIC_VERSION_NS
+
+using namespace ALEMBIC_VERSION_NS;
 
 } // End namespace AbcGeom
 }

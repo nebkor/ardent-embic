@@ -39,6 +39,7 @@
 
 namespace Alembic {
 namespace AbcGeom {
+namespace ALEMBIC_VERSION_NS {
 
 //-*****************************************************************************
 //! With properties, specific flavors of properties are expressed via the
@@ -160,6 +161,10 @@ ALEMBIC_ABCGEOM_DECLARE_SCHEMA_INFO( "AbcGeom_GeomBase_v1",
                                      GeomBaseSchemaInfo );
 
 #define ALEMBIC_ABCGEOM_CURVE_SCHEMA (CurvesSchemaInfo::title())
+
+} // End namespace ALEMBIC_VERSION_NS
+
+using namespace ALEMBIC_VERSION_NS;
 
 } // End namespace AbcGeom
 }
