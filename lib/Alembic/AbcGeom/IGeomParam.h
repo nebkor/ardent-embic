@@ -44,6 +44,7 @@
 
 namespace Alembic {
 namespace AbcGeom {
+namespace ALEMBIC_VERSION_NS {
 
 //-*****************************************************************************
 template <class TRAITS>
@@ -560,6 +561,10 @@ typedef ITypedGeomParam<N2dTPTraits>             IN2dGeomParam;
 
 typedef ITypedGeomParam<N3fTPTraits>             IN3fGeomParam;
 typedef ITypedGeomParam<N3dTPTraits>             IN3dGeomParam;
+
+} // End namespace ALEMBIC_VERSION_NS
+
+using namespace ALEMBIC_VERSION_NS;
 
 } // End namespace AbcGeom
 } // namespace Alembic
