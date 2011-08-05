@@ -587,13 +587,11 @@ MStatus AbcExport::doIt(const MArgList & args)
 }
 
 
-const char * AbcExportVersionString = "1.0";
 
 MStatus initializePlugin(MObject obj)
 {
     MStatus status;
-    MFnPlugin plugin(obj, "Alembic", AbcExportVersionString, "Any");
-
+    MFnPlugin plugin(obj, "Alembic", ABCEXPORT_VERSION, "Any");
 
     status = plugin.registerCommand(
         "AbcExport", AbcExport::creator,
@@ -604,17 +602,10 @@ MStatus initializePlugin(MObject obj)
         status.perror("registerCommand");
     }
 
-
-    // Announce ourselves and our version.
-    MString aboutCommand = "about -version";
-    MString mayaVersion;
-    MGlobal::executeCommand (aboutCommand, mayaVersion, false, false);
-    std::ostringstream sversionString;
-    sversionString << "AbcExport plugin v" << AbcExportVersionString 
-        << " for Maya " << mayaVersion << " for " 
-        << AbcA::GetLibraryVersion ();
-    MString info;
-    info = sversionString.str ().c_str ();
+    MString info = "AbcExport v";
+    info += ABCEXPORT_VERSION;
+    info += " using ";
+    info += Alembic::Abc::GetLibraryVersion().c_str();
     MGlobal::displayInfo(info);
 
     return status;

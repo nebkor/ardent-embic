@@ -74,11 +74,6 @@ MObject AlembicNode::mAbcFileNameAttr;
 MObject AlembicNode::mStartFrameAttr;
 MObject AlembicNode::mEndFrameAttr;
 
-MObject AlembicNode::mConnectAttr;
-MObject AlembicNode::mCreateIfNotFoundAttr;
-MObject AlembicNode::mRemoveIfNoUpdateAttr;
-MObject AlembicNode::mConnectRootNodesAttr;
-
 MObject AlembicNode::mOutSubDArrayAttr;
 MObject AlembicNode::mOutPolyArrayAttr;
 MObject AlembicNode::mOutCameraArrayAttr;
@@ -122,35 +117,6 @@ MStatus AlembicNode::initialize()
     status = nAttr.setWritable(false);
     status = nAttr.setStorable(true);
     status = addAttribute(mEndFrameAttr);
-
-    // set mConnect
-    mConnectAttr = nAttr.create("connect", "ct",
-        MFnNumericData::kBoolean, false, &status);
-    status = nAttr.setWritable(false);
-    status = nAttr.setStorable(true);
-    status = addAttribute(mConnectAttr);
-
-    // set mCreateIfNotFound
-    mCreateIfNotFoundAttr = nAttr.create("createIfNotFound", "crt",
-        MFnNumericData::kBoolean, false, &status);
-    status = nAttr.setWritable(false);
-    status = nAttr.setStorable(true);
-    status = addAttribute(mCreateIfNotFoundAttr);
-
-    // set mRemoveIfNoUpdate
-    mRemoveIfNoUpdateAttr = nAttr.create("removeIfNoUpdate", "rm",
-        MFnNumericData::kBoolean, false, &status);
-    status = nAttr.setWritable(false);
-    status = nAttr.setStorable(true);
-    status = addAttribute(mRemoveIfNoUpdateAttr);
-
-    // set mConnectUpdateNodes
-    fileNameDefaultObject = fileFnStringData.create("");
-    mConnectRootNodesAttr = tAttr.create("connectRoot", "cr",
-        MFnData::kString, fileNameDefaultObject);
-    status = tAttr.setWritable(false);
-    status = tAttr.setStorable(true);
-    status = addAttribute(mConnectRootNodesAttr);
 
     // add the output attributes
     // sampled subD mesh
@@ -295,16 +261,6 @@ MStatus AlembicNode::compute(const MPlug & plug, MDataBlock & dataBlock)
             printError(theError);
         }
 
-        // connect attributes
-        dataHandle = dataBlock.inputValue(mConnectAttr, &status);
-        mConnect = dataHandle.asBool();
-        dataHandle = dataBlock.inputValue(mCreateIfNotFoundAttr, &status);
-        mCreateIfNotFound = dataHandle.asBool();
-        dataHandle = dataBlock.inputValue(mRemoveIfNoUpdateAttr, &status);
-        mRemoveIfNoUpdate = dataHandle.asBool();
-        dataHandle = dataBlock.inputValue(mConnectRootNodesAttr, &status);
-        mConnectRootNodes = dataHandle.asString();
-
         // initialize some flags for plug update
         mSubDInitialized = false;
         mPolyInitialized = false;
@@ -313,11 +269,6 @@ MStatus AlembicNode::compute(const MPlug & plug, MDataBlock & dataBlock)
             CreateSceneVisitor::NONE, "");
 
         visitor.walk(archive);
-
-        if ( mConnect )
-        {
-            removeDangleAlembicNodes();
-        }
 
         if (visitor.hasSampledData())
         {
@@ -348,7 +299,8 @@ MStatus AlembicNode::compute(const MPlug & plug, MDataBlock & dataBlock)
 
         mOutRead[0] = true;
 
-        unsigned int propSize = mData.mPropList.size();
+        unsigned int propSize =
+            static_cast<unsigned int>(mData.mPropList.size());
 
         if (propSize > 0)
         {
@@ -406,7 +358,8 @@ MStatus AlembicNode::compute(const MPlug & plug, MDataBlock & dataBlock)
 
         mOutRead[1] = true;
 
-        unsigned int xformSize = mData.mXformList.size();
+        unsigned int xformSize =
+            static_cast<unsigned int>(mData.mXformList.size());
 
         if (xformSize > 0)
         {
@@ -463,7 +416,8 @@ MStatus AlembicNode::compute(const MPlug & plug, MDataBlock & dataBlock)
 
         mOutRead[8] = true;
 
-        unsigned int locSize = mData.mLocList.size();
+        unsigned int locSize =
+            static_cast<unsigned int>(mData.mLocList.size());
 
         if (locSize > 0)
         {
@@ -510,7 +464,8 @@ MStatus AlembicNode::compute(const MPlug & plug, MDataBlock & dataBlock)
 
         mOutRead[2] = true;
 
-        unsigned int subDSize = mData.mSubDList.size();
+        unsigned int subDSize =
+            static_cast<unsigned int>(mData.mSubDList.size());
 
         if (subDSize > 0)
         {
@@ -584,7 +539,8 @@ MStatus AlembicNode::compute(const MPlug & plug, MDataBlock & dataBlock)
 
         mOutRead[3] = true;
 
-        unsigned int polySize = mData.mPolyMeshList.size();
+        unsigned int polySize =
+            static_cast<unsigned int>(mData.mPolyMeshList.size());
 
         if (polySize > 0)
         {
@@ -658,7 +614,8 @@ MStatus AlembicNode::compute(const MPlug & plug, MDataBlock & dataBlock)
 
         mOutRead[4] = true;
 
-        unsigned int cameraSize = mData.mCameraList.size();
+        unsigned int cameraSize =
+            static_cast<unsigned int>(mData.mCameraList.size());
 
         if (cameraSize > 0)
         {
@@ -730,7 +687,8 @@ MStatus AlembicNode::compute(const MPlug & plug, MDataBlock & dataBlock)
 
         mOutRead[5] = true;
 
-        unsigned int nSurfaceSize = mData.mNurbsList.size();
+        unsigned int nSurfaceSize =
+            static_cast<unsigned int>(mData.mNurbsList.size());
 
         if (nSurfaceSize > 0)
         {
@@ -768,7 +726,8 @@ MStatus AlembicNode::compute(const MPlug & plug, MDataBlock & dataBlock)
 
         mOutRead[6] = true;
 
-        unsigned int nCurveGrpSize = mData.mCurvesList.size();
+        unsigned int nCurveGrpSize =
+            static_cast<unsigned int>(mData.mCurvesList.size());
 
         if (nCurveGrpSize > 0)
         {

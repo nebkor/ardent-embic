@@ -39,6 +39,7 @@
 namespace Alembic {
 namespace Abc {
 
+//-*****************************************************************************
 void
 GetArchiveInfo(
     IArchive & iArchive,
@@ -60,11 +61,6 @@ GetArchiveInfo(
 
     oDateWritten = md.get( kDateWrittenKey );
     oUserDescription = md.get( kUserDescriptionKey );
-}
-
-std::string GetLibraryVersion()
-{
-    return AbcA::GetLibraryVersion ();
 }
 
 } // End namespace Abc

@@ -40,6 +40,7 @@
 #include <Alembic/Abc/Foundation.h>
 #include <Alembic/Abc/IArchive.h>
 #include <Alembic/Abc/OArchive.h>
+#include <time.h>
 
 namespace Alembic {
 namespace Abc {
@@ -81,6 +82,7 @@ OArchive CreateArchiveWithInfo(
     //! Optional meta data or error handling policy
     const Argument &iArg1 = Argument() );
 
+//-*****************************************************************************
 void
 GetArchiveInfo(
     //! The Archive whose meta data will be inspected
@@ -101,7 +103,6 @@ GetArchiveInfo(
     //! Extra information, could be arguments to the tool that wrote the file.
     std::string & oUserDescription );
 
-//-*****************************************************************************
 //-*****************************************************************************
 template <class ARCHIVE_CTOR>
 OArchive CreateArchiveWithInfo(
@@ -126,13 +127,25 @@ OArchive CreateArchiveWithInfo(
     time_t rawtimeNow;
     time( &rawtimeNow );
     char dateBuf [128];
+#ifdef _WIN32 
+    ctime_s( dateBuf, 128, &rawtimeNow);
+#elif defined _WIN64
+    ctime_s( dateBuf, 128, &rawtimeNow);
+#else
     ctime_r( &rawtimeNow, dateBuf );
+#endif
+    if (strlen( dateBuf ))
+    {
+        if (dateBuf[strlen( dateBuf ) -1] == '\n')
+        {
+            dateBuf[strlen( dateBuf ) -1] = '\0';
+        }
+    }
     md.set( kDateWrittenKey, dateBuf );
 
     md.set( kUserDescriptionKey, iUserDescription );
 
     return OArchive( iCtor, iFileName, md, policy );
-
 }
 
 

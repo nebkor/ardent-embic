@@ -46,13 +46,14 @@ namespace Alembic {
 namespace AbcGeom {
 
 
-//! This class holds properties common to all physical-geometric classes
+//! This class holds properties common to all geometric classes
+//! that have a physical volume.
 //! - selfBounds
 //! - childBounds (optional)
 //! - GeomParams (optional)
 //! - UserProperties (optional)
 //!
-//! This class is used to encapsulate common functionality of the 
+//! This class encapsulates common functionality of the 
 //! real Geometry schema classes, like IPoints and IPolyMesh and so on
 template <class INFO>
 class IGeomBaseSchema : public Abc::ISchema<INFO>
@@ -188,19 +189,19 @@ protected:
 
 //-*****************************************************************************
 //! IGeomBase - A generic base set of properties and methods that encapsulate
-//! things common to AbcGeom types that have physical geometry
+//! things common to AbcGeom types that have a physical volume.
 //! - self bounds
 //! - children bounds (optional)
 //! - argbGeomParams (optional)
 //! - userProperties (optional)
 //! This class is a concrete instantiation of IGeomBaseSchema.
 //! Your archive might contain PolyMesh and SubD and Curves
-//! and Points objects etc. and this class, IGeomBase, gives you 
+//! and Points objects etc. This class, IGeomBase, gives you 
 //! access to the generic parts of those objects. For example, if you 
 //! just wish to iterate through an archive's hierarchy to examine bounding
 //! regions this class could be helpful to you. Then when you actually
 //! need to access the real data in the geometric type you can
-//! always create the needed type of I<geom type> object> via kWrapExisting.
+//! always create the needed type of I<geom type> object via kWrapExisting.
 class IGeomBase : public IGeomBaseSchema<GeomBaseSchemaInfo>
 {
 public:
@@ -227,9 +228,6 @@ public:
         Abc::Box3d m_childBounds;
     };
 
-    //-*************************************************************************
-    // GEOM BASE
-    //-*************************************************************************
 public:
     //! By convention we always define this_type in AbcGeom classes.
     //! Used by unspecified-bool-type conversion below
@@ -370,8 +368,8 @@ public:
 
     //-*************************************************************************
     //! This will check whether or not a given entity (as represented by
-    //! a metadata) strictly matches the interpretation of this
-    //! schema object
+    //! metadata) strictly matches the interpretation of this
+    //! schema object.
     static bool matches( const AbcA::MetaData &iMetaData,
                          SchemaInterpMatching iMatching = kStrictMatching )
     {

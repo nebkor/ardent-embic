@@ -35,9 +35,7 @@
 //-*****************************************************************************
 
 #include "AbcWriteJob.h"
-#include "AbcExport.h"
 #include <Alembic/AbcCoreHDF5/All.h>
-#include <Alembic/AbcCoreAbstract/All.h>
 namespace
 {
     bool hasDuplicates(const util::ShapeSet & dagPath)
@@ -792,7 +790,8 @@ bool AbcWriteJob::eval(double iFrame)
 
         std::string appWriter = "Maya ";
         appWriter += MGlobal::mayaVersion().asChar();
-        appWriter += " AbcExport";
+        appWriter += " AbcExport v";
+        appWriter += ABCEXPORT_VERSION;
 
         std::string userInfo = "Exported from: ";
         userInfo += MFileIO::currentFile().asChar();
@@ -810,8 +809,8 @@ bool AbcWriteJob::eval(double iFrame)
         mShapeTimeIndex = mRoot.addTimeSampling(*mShapeTime);
         mTransTimeIndex = mRoot.addTimeSampling(*mTransTime);
 
-        mBoxProp = Alembic::Abc::OBox3dProperty(mRoot.getTop().getProperties(),
-            ".childBnds", mTransTimeIndex);
+        mBoxProp =  Alembic::AbcGeom::CreateOArchiveBounds(mRoot,
+            mTransTimeIndex);
 
         if (!mRoot.valid())
         {

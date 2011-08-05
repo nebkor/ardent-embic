@@ -39,8 +39,9 @@
 #include <Alembic/AbcGeom/All.h>
 #include <Alembic/AbcCoreHDF5/All.h>
 
-using namespace ::Alembic::AbcGeom;
-using namespace ::Alembic::AbcCoreAbstract;
+using namespace Alembic::AbcGeom;
+using namespace Alembic::Abc;
+using namespace Alembic::AbcCoreAbstract;
 
 void checkAcyclic(const TimeSamplingType & tsType,
                   const std::string & fullNodeName)
@@ -168,6 +169,8 @@ void stitchScalarProp(const PropertyHeader & propHeader,
                 break;
             case Alembic::Util::kWstringPOD:
                 scalarPropIO< std::wstring >(reader, extent, writer);
+                break;
+            default:
                 break;
         }
 

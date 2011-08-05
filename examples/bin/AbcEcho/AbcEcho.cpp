@@ -35,6 +35,7 @@
 //-*****************************************************************************
 
 #include <Alembic/AbcGeom/All.h>
+#include <Alembic/AbcCoreAbstract/All.h>
 #include <Alembic/AbcCoreHDF5/All.h>
 
 #include <iostream>
@@ -171,27 +172,23 @@ int main( int argc, char *argv[] )
                        << std::endl;;
         
             std::string appName;
-            std::string writerVersion;
-            std::string alembicVersion;
+            std::string libraryVersionString;
+            uint32_t libraryVersion;
             std::string whenWritten;
             std::string userDescription;
-            Alembic::AbcCoreAbstract::GetArchiveInfo (archive.getPtr(),
+            GetArchiveInfo (archive,
                             appName,
-                            writerVersion,
-                            alembicVersion,
+                            libraryVersionString,
+                            libraryVersion,
                             whenWritten,
                             userDescription);
+        
             if (appName != "")
             {
-                std::cout << argv[1] << std::endl;
-                std::cout << "  file written by: " << appName << "  version " 
-                          << writerVersion << std::endl;
-                std::cout << "  using Alembic : " << alembicVersion 
-                          << std::endl;
+                std::cout << "  file written by: " << appName << std::endl;
+                std::cout << "  using Alembic : " << libraryVersionString << std::endl;
                 std::cout << "  written on : " << whenWritten << std::endl;
-                std::cout << "  user description : " 
-                          << userDescription << std::endl;
-                std::cout << std::endl;
+                std::cout << "  user description : " << userDescription << std::endl;
             }
             else
             {

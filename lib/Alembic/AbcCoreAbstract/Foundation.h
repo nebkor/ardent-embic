@@ -76,7 +76,7 @@ namespace ALEMBIC_VERSION_NS {
 //! Alembic version number Major/Minor/Patch XX.YY.ZZ
 #define ALEMBIC_LIBRARY_VERSION         10000
 #define ALEMBIC_LIBRARY_VERSION_1_0_0   10000
-#define ALEMBIC_API_VERSION_1_0rc1       9040
+#define ALEMBIC_LIBRARY_VERSION_1_0rc1   9040
 
 //! Helper function which returns the version and date built in a string
 //! e.g. "Alembic 1.0.rc1 (built Jul  6 2011)"
