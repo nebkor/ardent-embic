@@ -1,7 +1,7 @@
 ##-*****************************************************************************
 ##
 ## Copyright (c) 2009-2011,
-##  Sony Pictures Imageworks, Inc. and
+##  Sony Pictures Imageworks Inc. and
 ##  Industrial Light & Magic, a division of Lucasfilm Entertainment Company Ltd.
 ##
 ## All rights reserved.
@@ -16,7 +16,7 @@
 ## in the documentation and/or other materials provided with the
 ## distribution.
 ## *       Neither the name of Sony Pictures Imageworks, nor
-## Industrial Light & Magic nor the names of their contributors may be used
+## Industrial Light & Magic, nor the names of their contributors may be used
 ## to endorse or promote products derived from this software without specific
 ## prior written permission.
 ##
@@ -34,17 +34,7 @@
 ##
 ##-*****************************************************************************
 
-SET( CORE_LIBS AlembicGLUtil AlembicUtil )
-
-ADD_EXECUTABLE( GlutSkeleton main.cpp )
-
-TARGET_LINK_LIBRARIES( GlutSkeleton
-                      ${CORE_LIBS}
-                      ${ALEMBIC_GL_LIBS}
-                      ${CMAKE_THREAD_LIBS_INIT} 
-                      ${ZLIB_LIBRARIES}
-                      ${EXTERNAL_MATH_LIBS} )
-
-INSTALL( TARGETS GlutSkeleton
-         DESTINATION bin )
-
+IF( ${ALEMBIC_ARNOLD_FOUND} )
+ADD_SUBDIRECTORY( Tests )
+ADD_SUBDIRECTORY( Procedural )
+ENDIF()

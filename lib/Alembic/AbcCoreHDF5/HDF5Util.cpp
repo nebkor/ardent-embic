@@ -91,24 +91,6 @@ hid_t DsetGzipCreatePlist( const Dimensions &dims, int level )
 }
 
 //-*****************************************************************************
-static void getDatatypeArrayDims( hid_t iDtype, Dimensions &dims )
-{
-    ABCA_ASSERT( iDtype >= 0, "Invalid datatype in getDatatypeArrayDims" );
-    
-    int ndims = H5Tget_array_ndims( iDtype );
-    ABCA_ASSERT( ndims > 0,
-                  "getDatatypeArrayDims() H5Tget_array_ndims failed" );
-
-    HDimensions hdims( ( size_t )ndims );
-    ndims = H5Tget_array_dims2( iDtype, hdims.rootPtr() );
-    ABCA_ASSERT( ndims > 0,
-                  "getDatatypeArrayDims() H5Tget_array_dims failed" );
-    ABCA_ASSERT( ndims == hdims.rank(),
-                  "getDatatypeArrayDims() inconsistent ranks" );
-    dims = hdims;
-}
-
-//-*****************************************************************************
 bool EquivalentDatatypes( hid_t iA, hid_t iB )
 {
     if ( iA >= 0 && iB >= 0 && H5Tequal( iA, iB ) > 0 )

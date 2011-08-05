@@ -44,7 +44,7 @@ namespace ALEMBIC_VERSION_NS {
 // This is here as a minimal compile test against which the TypedScalar stuff
 // has to compile. It's to avoid not knowing that stuff in the templates
 // is very broken until much later.
-static void __test( OObject &iObject )
+void __test( OObject &iObject )
 {
     OBoolArrayProperty boolProp( OCompoundProperty( iObject, kTop ),
                                  "boolProp" );

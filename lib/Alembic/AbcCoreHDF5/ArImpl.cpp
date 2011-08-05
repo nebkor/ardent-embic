@@ -67,7 +67,8 @@ ArImpl::ArImpl( const std::string &iFileName,
     ABCA_ASSERT(version == ALEMBIC_HDF5_FILE_VERSION,
         "Unsupported file version detected.");
 
-    int32_t fileVersion = ALEMBIC_LIBRARY_VERSION;
+    // if it isn't there, it's pre 1.0
+    int32_t fileVersion = 9999;
     if (H5Aexists( m_file, "abc_release_version" ))
     {
         H5LTget_attribute_int( m_file, ".", "abc_release_version",

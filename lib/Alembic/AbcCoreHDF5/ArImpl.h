@@ -101,7 +101,7 @@ private:
 
     TopOrImpl *m_top;
 
-    int32_t     m_archiveVersion;
+    int32_t m_archiveVersion;
 
     std::vector <  AbcA::TimeSamplingPtr > m_timeSamples;
 

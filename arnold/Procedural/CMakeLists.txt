@@ -1,8 +1,7 @@
 ##-*****************************************************************************
 ##
-## Copyright (c) 2009-2011,
-##  Sony Pictures Imageworks Inc. and
-##  Industrial Light & Magic, a division of Lucasfilm Entertainment Company Ltd.
+## Copyright (c) 2009-2011, Industrial Light & Magic,
+##   a division of Lucasfilm Entertainment Company Ltd.
 ##
 ## All rights reserved.
 ##
@@ -33,26 +32,45 @@
 ##
 ##-*****************************************************************************
 
-PROJECT( GTO_MESHES_TO_ABC )
-
-# Create the library
+PROJECT( ALEMBIC_ARNOLD_PROCEDURAL_MODULE )
 
 
-SET( TEST_LIBS
-     AlembicAbcGeom
-     AlembicAbc
-     AlembicAbcCoreHDF5
-     AlembicAbcCoreAbstract
-     AlembicMD5Hash
-     AlembicUtil
-     GtoContainer
-     Gto
-     ${ALEMBIC_HDF5_LIBS}
-     ${ALEMBIC_ILMBASE_LIBS}
-     ${CMAKE_THREAD_LIBS_INIT}
-     ${ZLIB_LIBRARIES} ${EXTERNAL_MATH_LIBS} )
+IF( ${ALEMBIC_ARNOLD_FOUND} )
 
-#-******************************************************************************
-ADD_EXECUTABLE( GtoMeshesToAbc main.cpp )
-TARGET_LINK_LIBRARIES( GtoMeshesToAbc ${TEST_LIBS} )
+SET( H_FILES
+  ArbGeomParams.h
+  PathUtil.h
+  ProcArgs.h
+  SampleUtil.h
+  WriteGeo.h
+  )
 
+SET( CXX_FILES
+  ArbGeomParams.cpp
+  PathUtil.cpp
+  ProcArgs.cpp
+  ProcMain.cpp
+  SampleUtil.cpp
+  WriteGeo.cpp
+)
+
+SET( CORE_LIBS
+  AlembicAbcGeom
+  AlembicAbc
+  AlembicAbcCoreHDF5
+  AlembicAbcCoreAbstract
+  AlembicUtil )
+
+ADD_ARNOLD_CXX_PLUGIN( AlembicArnoldProcedural ProcMain.cpp ${H_FILES} ${CXX_FILES} )
+TARGET_LINK_LIBRARIES( AlembicArnoldProcedural
+  ${CORE_LIBS}
+  ${ALEMBIC_HDF5_LIBS}
+  ${ALEMBIC_ILMBASE_LIBS}
+  ${CMAKE_THREAD_LIBS_INIT}
+  ${ZLIB_LIBRARIES}
+)
+
+
+
+
+ENDIF()

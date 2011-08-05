@@ -167,7 +167,6 @@ public:
     //! This will silently overwrite an existing value.
     void set( const std::string &iKey, const std::string &iData )
     {
-        ABCA_ASSERT (iData != "", "metadata value of '' isn't allowed");
         m_tokenMap.setValue( iKey, iData );
     }
 

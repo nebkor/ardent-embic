@@ -34,10 +34,9 @@
 ##
 ##-*****************************************************************************
 
-# Recurse into all the subdirectories
+INCLUDE_DIRECTORIES( ${ALEMBIC_ARNOLD_INCLUDE_PATH} )
 
-ADD_SUBDIRECTORY( Util )
-ADD_SUBDIRECTORY( AbcCoreAbstract )
-ADD_SUBDIRECTORY( AbcCoreHDF5 )
-ADD_SUBDIRECTORY( Abc )
-ADD_SUBDIRECTORY( AbcGeom )
+SET( CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} )
+
+ADD_EXECUTABLE( arnold_procedural_testbed testbed.cpp )
+TARGET_LINK_LIBRARIES( arnold_procedural_testbed ${ALEMBIC_ARNOLD_LIBARNOLD} dl )

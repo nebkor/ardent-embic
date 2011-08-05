@@ -1,7 +1,7 @@
 //-*****************************************************************************
 //
 // Copyright (c) 2009-2011,
-//  Sony Pictures Imageworks, Inc. and
+//  Sony Pictures Imageworks Inc. and
 //  Industrial Light & Magic, a division of Lucasfilm Entertainment Company Ltd.
 //
 // All rights reserved.
@@ -16,7 +16,7 @@
 // in the documentation and/or other materials provided with the
 // distribution.
 // *       Neither the name of Sony Pictures Imageworks, nor
-// Industrial Light & Magic nor the names of their contributors may be used
+// Industrial Light & Magic, nor the names of their contributors may be used
 // to endorse or promote products derived from this software without specific
 // prior written permission.
 //
@@ -33,74 +33,36 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 //-*****************************************************************************
+#ifndef _Alembic_Arnold_SampleUtil_h_
+#define _Alembic_Arnold_SampleUtil_h_
 
-#include <Alembic/GLUtil/All.h>
-#include <iostream>
-#include <stdlib.h>
-#include <stdio.h>
-#include <assert.h>
-#include <string.h>
+#include <Alembic/AbcGeom/All.h>
 
-//-*****************************************************************************
-// GLUT display callback.  This is called whenever the display window needs
-// to be refreshed
-void display()
-{
-    glDrawBuffer( GL_BACK );    
-    glClearColor( 0.0f, 0.0f, 0.0f, 1.0f );
-    glClear( GL_COLOR_BUFFER_BIT );
-    
-    // Put user draw code here....
-    
-    glutSwapBuffers();    
-}
+#include "ProcArgs.h"
+
+#include <set>
+
+using namespace Alembic::AbcGeom;
+
+typedef std::set<Abc::chrono_t> SampleTimeSet;
+typedef std::map<Abc::chrono_t, M44d> MatrixSampleMap;
 
 //-*****************************************************************************
-// GLUT keyboard handler.  This is called whenever a key is hit.
-void keyboardFunc(unsigned char key, int x, int y)
-{
-    switch( key )
-    {
-    case 27:   // ESC
-        exit( 0 );
-        break;
-    }
-}
+void GetRelevantSampleTimes( ProcArgs &args, TimeSamplingPtr timeSampling,
+                             size_t numSamples, SampleTimeSet &output,
+                             MatrixSampleMap * inheritedSamples = 0);
 
 //-*****************************************************************************
-// GLUT mouse button handler.  This is called whenever a mouse button is hit.
-void mouseFunc( int button, int state, int x, int y )
-{
-    // Nothing
-}
+
+void ConcatenateXformSamples( ProcArgs &args,
+        const MatrixSampleMap & parentSamples,
+        const MatrixSampleMap & localSamples,
+        MatrixSampleMap & outputSamples);
 
 //-*****************************************************************************
-// GLUT mouse motion handler.  This is called whenever the mouse is moved
-// while a mouse button is being hit.
-void mouseDragFunc( int x, int y )
-{
-    // Nothing
-}
 
-//-*****************************************************************************
-int main( int argc, char **argv )
-{
-    // Do basic glut setup stuff
-    glutInitDisplayMode( GLUT_RGBA | GLUT_ALPHA | GLUT_DOUBLE | GLUT_DEPTH );
-    glutInitWindowSize( 640, 480 );
-    glutInit( &argc, argv ); // parses some special glut args (see manpage)
-    glutCreateWindow( "glut_skeleton" );
-  
-    // Initialize GL.
-    Alembic::GLUtil::InitGL();
+Abc::chrono_t GetRelativeSampleTime( ProcArgs &args, Abc::chrono_t sampleTime);
 
-    // Set up callbacks
-    glutDisplayFunc( display );    
-    glutKeyboardFunc( keyboardFunc );
-    glutMouseFunc( mouseFunc );
-    glutMotionFunc( mouseDragFunc );
-    
-    glutMainLoop(); // NOTE: never returns
-	
-    return 0;
-}
+
+
+#endif
