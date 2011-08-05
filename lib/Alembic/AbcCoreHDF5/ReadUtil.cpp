@@ -133,7 +133,7 @@ ReadSmallArray( hid_t iParent,
                      << " as scalar" );
 
         hssize_t numPoints = H5Sget_simple_extent_npoints( attrSpace );
-        ABCA_ASSERT( numPoints <= iMaxElems && numPoints > -1,
+        ABCA_ASSERT( numPoints <= ( hssize_t )iMaxElems && numPoints > -1,
                      "Too many points in SmallArrayRead" );
 
         oNumElems = ( size_t )numPoints;

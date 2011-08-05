@@ -1,7 +1,7 @@
 //-*****************************************************************************
 //
 // Copyright (c) 2009-2011,
-//  Sony Pictures Imageworks, Inc. and
+//  Sony Pictures Imageworks Inc. and
 //  Industrial Light & Magic, a division of Lucasfilm Entertainment Company Ltd.
 //
 // All rights reserved.
@@ -16,7 +16,7 @@
 // in the documentation and/or other materials provided with the
 // distribution.
 // *       Neither the name of Sony Pictures Imageworks, nor
-// Industrial Light & Magic nor the names of their contributors may be used
+// Industrial Light & Magic, nor the names of their contributors may be used
 // to endorse or promote products derived from this software without specific
 // prior written permission.
 //
@@ -34,34 +34,19 @@
 //
 //-*****************************************************************************
 
-#include <Alembic/Abc/OTypedScalarProperty.h>
+#ifndef _Alembic_Arnold_ArbGeomParams_h_
+#define _Alembic_Arnold_ArbGeomParams_h_
 
-namespace Alembic {
-namespace Abc {
-namespace ALEMBIC_VERSION_NS {
+#include <ai.h>
+#include <Alembic/AbcGeom/All.h>
 
-namespace {
+using namespace Alembic::AbcGeom;
 
-//-*****************************************************************************
-// This is here as a minimal compile test against which the TypedScalar stuff
-// has to compile. It's to avoid not knowing that stuff in the templates
-// is very broken until much later.
-void __test( OObject &iObject )
-{
-    OBoolProperty boolProp( OCompoundProperty( iObject, kTop ),
-                            "boolProp" );
-    OInt32Property intProp( OCompoundProperty( iObject, kTop ),
-                          "intProp" );
-    OInt32Property intProp2( intProp.getPtr(), kWrapExisting );
+void AddArbitraryGeomParams( ICompoundProperty &parent,
+                             ISampleSelector &sampleSelector,
+                             AtNode * primNode,
+                             const std::set<std::string> * excludeNames = NULL
+                           );
 
-    intProp.set( 5 );
-    intProp2.set( 6 );
 
-    boolProp.set( false );
-}
-
-}
-
-} // End namespace ALEMBIC_VERSION_NS
-} // End namespace Abc
-} // End namespace Alembic
+#endif

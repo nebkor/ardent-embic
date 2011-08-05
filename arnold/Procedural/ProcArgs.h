@@ -1,7 +1,7 @@
 //-*****************************************************************************
 //
 // Copyright (c) 2009-2011,
-//  Sony Pictures Imageworks, Inc. and
+//  Sony Pictures Imageworks Inc. and
 //  Industrial Light & Magic, a division of Lucasfilm Entertainment Company Ltd.
 //
 // All rights reserved.
@@ -16,7 +16,7 @@
 // in the documentation and/or other materials provided with the
 // distribution.
 // *       Neither the name of Sony Pictures Imageworks, nor
-// Industrial Light & Magic nor the names of their contributors may be used
+// Industrial Light & Magic, nor the names of their contributors may be used
 // to endorse or promote products derived from this software without specific
 // prior written permission.
 //
@@ -34,34 +34,56 @@
 //
 //-*****************************************************************************
 
-#include <Alembic/Abc/OTypedScalarProperty.h>
+#ifndef _Alembic_Arnold_ProcArgs_h_
+#define _Alembic_Arnold_ProcArgs_h_
 
-namespace Alembic {
-namespace Abc {
-namespace ALEMBIC_VERSION_NS {
+#include <ai.h>
+#include <string>
+#include <vector>
 
-namespace {
 
 //-*****************************************************************************
-// This is here as a minimal compile test against which the TypedScalar stuff
-// has to compile. It's to avoid not knowing that stuff in the templates
-// is very broken until much later.
-void __test( OObject &iObject )
+struct ProcArgs
 {
-    OBoolProperty boolProp( OCompoundProperty( iObject, kTop ),
-                            "boolProp" );
-    OInt32Property intProp( OCompoundProperty( iObject, kTop ),
-                          "intProp" );
-    OInt32Property intProp2( intProp.getPtr(), kWrapExisting );
+    //constructor parses
+    ProcArgs( const char * paramStr );
 
-    intProp.set( 5 );
-    intProp2.set( 6 );
+    //copy constructor
+    ProcArgs( const ProcArgs &rhs )
+    : filename( rhs.filename )
+    , nameprefix( rhs.nameprefix )
+    , objectpath( rhs.objectpath )
+    , frame( rhs.frame )
+    , fps( rhs.fps )
+    , shutterOpen( rhs.shutterOpen )
+    , shutterClose( rhs.shutterClose )
+    , excludeXform( rhs.excludeXform )
+    , makeInstance( rhs.makeInstance )
+    , subdIterations ( rhs.subdIterations )
+    , proceduralNode( rhs.proceduralNode )
+    {}
 
-    boolProp.set( false );
-}
+    //member variables
+    std::string filename;
+    std::string nameprefix;
+    
+    std::string objectpath;
+    double frame;
+    double fps;
+    double shutterOpen;
+    double shutterClose;
+    
+    bool excludeXform;
+    
+    bool makeInstance;
+    int subdIterations;
+    
+    AtNode * proceduralNode;
+    
+    std::vector<struct AtNode *> createdNodes;
+    
+    
+    void usage();
+};
 
-}
-
-} // End namespace ALEMBIC_VERSION_NS
-} // End namespace Abc
-} // End namespace Alembic
+#endif

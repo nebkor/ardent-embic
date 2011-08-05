@@ -57,8 +57,8 @@ GetArchiveInfo(
 
     AbcA::MetaData md = iArchive.getPtr()->getMetaData();
     oApplicationWriter = md.get( kApplicationNameKey );
-    oAlembicVersion = md.get( kAlembicVersionKey );
-    oAlembicApiVersion = atoi( md.get( kAlembicApiVersionKey ).c_str() );
+    oAlembicVersion = md.get( "_ai_AlembicVersion" );
+    oAlembicApiVersion = iArchive.getArchiveVersion();
 
     oDateWritten = md.get( kDateWrittenKey );
     oUserDescription = md.get( kUserDescriptionKey );

@@ -47,7 +47,7 @@ namespace Alembic {
 namespace AbcGeom {
 namespace ALEMBIC_VERSION_NS {
 
-namespace Abc = ::Alembic::Abc;
+namespace Abc = ::Alembic::Abc::ALEMBIC_VERSION_NS;
 using namespace Abc;
 
 //-*****************************************************************************

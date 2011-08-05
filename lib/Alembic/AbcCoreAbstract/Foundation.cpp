@@ -61,22 +61,28 @@ static const char * _kAlembicVersionString =
 	kAlembicVersionStringALEMBIC_API_VERSION_1_0rc2;
 
 //-*****************************************************************************
-std::string 
+std::string
 GetLibraryVersionShort()
 {
-    std::string versionString (_kAlembicVersionString);
-    return versionString;
+    int32_t ver = ALEMBIC_LIBRARY_VERSION;
+
+    std::ostringstream ostrm;
+    ostrm << ( ver / 10000 ) << "." <<
+             ( ( ver / 100 ) - ( ( ver / 10000 ) * 100 ) ) << "." <<
+             ( ver - ( ( ver / 100 ) * 100 ) );
+
+    return ostrm.str();
 }
 
 //-*****************************************************************************
-std::string 
+std::string
 GetLibraryVersion()
 {
-    const char * date = __DATE__;
-    std::string   alembicVersion = GetLibraryVersionShort();
+    // "Alembic 1.0.0 (7/6/2011)"
+    std::string alembicVersion = GetLibraryVersionShort();
     std::ostringstream sversionString;
     sversionString << "Alembic " << alembicVersion 
-        << " (built " << date << ")";
+        << " (built " << __DATE__ << " " << __TIME__ ")";
  
     return sversionString.str ();
 }

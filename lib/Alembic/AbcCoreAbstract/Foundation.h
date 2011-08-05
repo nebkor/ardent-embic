@@ -58,6 +58,21 @@ namespace Alembic {
 namespace AbcCoreAbstract {
 namespace ALEMBIC_VERSION_NS {
 
+// Just pull the whole Util namespace in. This is safe.
+using namespace ::Alembic::Util;
+
+//! Index type
+//! Just being pedantic.
+typedef int64_t index_t;
+
+//! Chrono type.
+//! This is used whenever time values are needed in the library. They are
+//! generally assumed to be seconds, but this does not need to be explicitly
+//! enforced by the API.
+typedef float64_t chrono_t;
+// Util/PlainOldDataType.h defines the enum PlainOldDataType
+#define kChrono_TPOD  kFloat64POD
+
 //-*****************************************************************************
 // Alembic version information:
 // 
@@ -84,24 +99,6 @@ std::string GetLibraryVersion();
 //! Returns just the version number, as a string, of the Alembic library.
 //! e.g. "1.0.0"
 std::string GetLibraryVersionShort();
-
-
-
-// Just pull the whole Util namespace in. This is safe.
-using namespace ::Alembic::Util;
-
-//! Index type
-//! Just being pedantic.
-typedef int64_t index_t;
-
-//! Chrono type.
-//! This is used whenever time values are needed in the library. They are
-//! generally assumed to be seconds, but this does not need to be explicitly
-//! enforced by the API.
-typedef float64_t chrono_t;
-// Util/PlainOldDataType.h defines the enum PlainOldDataType
-#define kChrono_TPOD  kFloat64POD
-
 
 //-*****************************************************************************
 //! Exception types borrowed from Alembic::Util. We should probably eventually

@@ -157,7 +157,7 @@ bool AprImpl::readKey( hid_t iGroup,
                      << iSampleName );
         DspaceCloser dspaceCloser( dspaceId );
 
-        oKey.readPOD = m_header->getDataType().getPod();
+        oKey.readPOD = dataType.getPod();
         oKey.origPOD = oKey.readPOD;
 
         oKey.numBytes = H5Sget_simple_extent_npoints( dspaceId );
@@ -172,7 +172,7 @@ bool AprImpl::readKey( hid_t iGroup,
         }
         else
         {
-            oKey.numBytes *= m_header->getDataType().getNumBytes();
+            oKey.numBytes *= dataType.getNumBytes();
         }
 
         return true;

@@ -67,7 +67,7 @@ namespace ALEMBIC_VERSION_NS {
 
 //-*****************************************************************************
 // Bring 'em ALL in.
-namespace AbcA = ::Alembic::AbcCoreAbstract::v1;
+namespace AbcA = ::Alembic::AbcCoreAbstract::ALEMBIC_VERSION_NS;
 using namespace AbcA;
 
 //-*****************************************************************************

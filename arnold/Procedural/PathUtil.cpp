@@ -1,7 +1,7 @@
 //-*****************************************************************************
 //
 // Copyright (c) 2009-2011,
-//  Sony Pictures Imageworks, Inc. and
+//  Sony Pictures Imageworks Inc. and
 //  Industrial Light & Magic, a division of Lucasfilm Entertainment Company Ltd.
 //
 // All rights reserved.
@@ -16,7 +16,7 @@
 // in the documentation and/or other materials provided with the
 // distribution.
 // *       Neither the name of Sony Pictures Imageworks, nor
-// Industrial Light & Magic nor the names of their contributors may be used
+// Industrial Light & Magic, nor the names of their contributors may be used
 // to endorse or promote products derived from this software without specific
 // prior written permission.
 //
@@ -33,35 +33,23 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 //-*****************************************************************************
+#include "PathUtil.h"
 
-#include <Alembic/Abc/OTypedScalarProperty.h>
-
-namespace Alembic {
-namespace Abc {
-namespace ALEMBIC_VERSION_NS {
-
-namespace {
+#include <boost/tokenizer.hpp>
 
 //-*****************************************************************************
-// This is here as a minimal compile test against which the TypedScalar stuff
-// has to compile. It's to avoid not knowing that stuff in the templates
-// is very broken until much later.
-void __test( OObject &iObject )
+void TokenizePath( const std::string &path, std::vector<std::string> &result )
 {
-    OBoolProperty boolProp( OCompoundProperty( iObject, kTop ),
-                            "boolProp" );
-    OInt32Property intProp( OCompoundProperty( iObject, kTop ),
-                          "intProp" );
-    OInt32Property intProp2( intProp.getPtr(), kWrapExisting );
+    typedef boost::char_separator<char> Separator;
+    typedef boost::tokenizer<Separator> Tokenizer;
 
-    intProp.set( 5 );
-    intProp2.set( 6 );
+    Tokenizer tokenizer( path, Separator( "/" ) );
 
-    boolProp.set( false );
+    for ( Tokenizer::iterator iter = tokenizer.begin() ; iter != tokenizer.end() ;
+          ++iter )
+    {
+        if ( (*iter).empty() ) { continue; }
+
+        result.push_back( *iter );
+    }
 }
-
-}
-
-} // End namespace ALEMBIC_VERSION_NS
-} // End namespace Abc
-} // End namespace Alembic
