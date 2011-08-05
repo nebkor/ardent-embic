@@ -62,6 +62,9 @@ void archiveInfoTest()
         TESTING_ASSERT( archive.getPtr()->getMetaData().get("taco") == "bar" );
         TESTING_ASSERT( archive.getPtr()->getMetaData().get("potato") ==
             "salad" );
+        TESTING_ASSERT( archive.getArchiveVersion() ==
+                        ALEMBIC_LIBRARY_VERSION );
+
         std::string appInfo;
         std::string abcVersionStr;
         Alembic::Util::uint32_t abcVersion = 0;

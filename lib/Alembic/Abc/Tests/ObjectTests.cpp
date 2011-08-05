@@ -50,7 +50,7 @@ using namespace Abc;
 
 void writeFlatHierarchy(const std::string &archiveName)
 {
-    const unsigned int numChildren = 10;
+    const int numChildren = 10;
 
     // Create an archive for writing. Indicate that we want Alembic to
     //   throw exceptions on errors.
@@ -82,7 +82,7 @@ void readFlatHierarchy(const std::string &archiveName)
     IObject archiveTop = archive.getTop();
 
     // Determine the number of (top level) children the archive has
-    const unsigned int numChildren = archiveTop.getNumChildren();
+    const int numChildren = archiveTop.getNumChildren();
     ABCA_ASSERT( numChildren == 10,
                  "Expected 10 children, found " << numChildren );
 

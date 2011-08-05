@@ -53,7 +53,6 @@ static boost::shared_ptr<Abc::IArchive> mkIArchive( const std::string &iName )
         new Abc::IArchive( ::Alembic::AbcCoreHDF5::ReadArchive(), iName ) );
 }
 
-
 //-*****************************************************************************
 void register_iarchive()
 {
