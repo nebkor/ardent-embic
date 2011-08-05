@@ -63,6 +63,7 @@
 
 namespace Alembic {
 namespace Abc {
+namespace ALEMBIC_VERSION_NS {
 
 //-*****************************************************************************
 // Bring 'em ALL in.
@@ -215,6 +216,10 @@ inline AbcA::ArchiveReaderPtr GetArchiveReaderPtr( AbcA::ArchiveReaderPtr iPtr )
 {
     return iPtr;
 }
+
+} // End namespace ALEMBIC_VERSION_NS
+
+using namespace ALEMBIC_VERSION_NS;
 
 } // End namespace Abc
 } // End namespace Alembic

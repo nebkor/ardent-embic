@@ -44,6 +44,7 @@
 
 namespace Alembic {
 namespace Abc {
+namespace ALEMBIC_VERSION_NS {
 
 //-*****************************************************************************
 // Alembic archive information:
@@ -148,6 +149,10 @@ OArchive CreateArchiveWithInfo(
     return OArchive( iCtor, iFileName, md, policy );
 }
 
+
+} // End namespace ALEMBIC_VERSION_NS
+
+using namespace ALEMBIC_VERSION_NS;
 
 } // End namespace Abc
 } // End namespace Alembic

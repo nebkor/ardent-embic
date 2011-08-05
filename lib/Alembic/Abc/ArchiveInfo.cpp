@@ -38,6 +38,7 @@
 
 namespace Alembic {
 namespace Abc {
+namespace ALEMBIC_VERSION_NS {
 
 //-*****************************************************************************
 void
@@ -63,5 +64,6 @@ GetArchiveInfo(
     oUserDescription = md.get( kUserDescriptionKey );
 }
 
+} // End namespace ALEMBIC_VERSION_NS
 } // End namespace Abc
 } // End namespace Alembic

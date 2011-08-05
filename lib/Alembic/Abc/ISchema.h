@@ -43,6 +43,7 @@
 
 namespace Alembic {
 namespace Abc {
+namespace ALEMBIC_VERSION_NS {
 
 //-*****************************************************************************
 //! See Schema Notes in OSchema.h
@@ -232,6 +233,10 @@ inline ISchema<INFO>::ISchema(
 
     ALEMBIC_ABC_SAFE_CALL_END_RESET();
 }
+
+} // End namespace ALEMBIC_VERSION_NS
+
+using namespace ALEMBIC_VERSION_NS;
 
 } // End namespace Abc
 } // End namespace Alembic
