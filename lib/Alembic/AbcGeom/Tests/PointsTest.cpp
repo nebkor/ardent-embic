@@ -277,8 +277,6 @@ void RunAndWriteParticles
     for ( index_t sampIndex = 0;
           sampIndex < ( index_t )iNumFrames; ++sampIndex )
     {
-        chrono_t sampTime = (( chrono_t )sampIndex) * iSpf;
-
         // First, write the sample.
         OPointsSchema::Sample psamp(
             V3fArraySample( parts.positionVec() ),

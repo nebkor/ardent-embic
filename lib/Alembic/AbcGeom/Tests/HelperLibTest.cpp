@@ -59,9 +59,9 @@ using Alembic::Util::uint32_t;
 
 void writeSimpleProperties(const std::string &archiveName)
 {
-    const unsigned int numChildren = 3;
+    const size_t numChildren = 3;
 
-    const unsigned int numSamples = 5;
+    const size_t numSamples = 5;
     const chrono_t dt = 1.0 / 24.0;
 
     TimeSampling ts(dt, 666.0); // uniform with cycle=dt starting at 666.0
@@ -83,7 +83,7 @@ void writeSimpleProperties(const std::string &archiveName)
         foodub.set( 2.0 );
     }
 
-    for (int ii=0; ii<numChildren; ii++)
+    for ( size_t ii=0 ; ii < numChildren ; ++ii )
     {
         // Create 'numChildren' children, all parented under
         //  the archive
@@ -97,7 +97,7 @@ void writeSimpleProperties(const std::string &archiveName)
                               "mass"); // name
 
         // Write out the samples
-        for (int tt=0; tt<numSamples; tt++)
+        for ( size_t tt=0 ; tt < numSamples ; ++tt )
         {
             double mm = (1.0 + 0.1*tt); // vary the mass
             mass.set( mm );
@@ -128,19 +128,19 @@ void readSimpleProperties(const std::string &archiveName)
     IObject archiveTop = archive.getTop();
 
     // Determine the number of (top level) children the archive has
-    const unsigned int numChildren = archiveTop.getNumChildren();
+    const size_t numChildren = archiveTop.getNumChildren();
     TESTING_ASSERT( numChildren == 4 );
     std::cout << "The archive has " << numChildren << " children:"
               << std::endl;
 
 
 
-    std::cout << "Does the archive-top object have VisibilityProperty? " 
+    std::cout << "Does the archive-top object have VisibilityProperty? "
               << (bool) (GetVisibilityProperty (archiveTop))
               << std::endl;
 
     // Iterate through them, print out their names
-    for (int ii=0; ii<numChildren; ii++)
+    for ( size_t ii = 0 ; ii < numChildren ; ++ii )
     {
         IObject child( archiveTop, archiveTop.getChildHeader( ii ).getName() );
         std::cout << "  " << child.getName();
@@ -156,10 +156,12 @@ void readSimpleProperties(const std::string &archiveName)
                   << std::endl;
 
         std::vector<std::string> propNames;
-        for (int pp=0; pp<numProperties; pp++)
+        for ( size_t pp=0 ; pp < numProperties ; ++pp )
+        {
             propNames.push_back( props.getPropertyHeader(pp).getName() );
+        }
 
-        for (int jj=0; jj<numProperties; jj++)
+        for ( size_t jj=0 ; jj < numProperties ; ++jj )
         {
             std::cout << "    ..named " << propNames[jj] << std::endl;
 
@@ -254,8 +256,10 @@ void readSimpleProperties(const std::string &archiveName)
             if (numSamples > 0)
             {
                 std::cout << " ( ";
-                for (int ss=0; ss<numSamples; ss++)
+                for ( size_t ss=0 ; ss < numSamples ; ++ss )
+                {
                     std::cout << ts->getSampleTime(ss) << " ";
+                }
                 std::cout << ")";
             }
             std::cout << std::endl;
@@ -263,7 +267,7 @@ void readSimpleProperties(const std::string &archiveName)
             std::cout << "    ..and values: ";
             if (numSamples > 0)
             {
-                for (int ss=0; ss<numSamples; ss++)
+                for ( size_t ss=0 ; ss < numSamples ; ++ss )
                 {
                     ISampleSelector iss( (index_t) ss);
                     switch (dType.getPod())
@@ -374,7 +378,7 @@ void readSimpleProperties(const std::string &archiveName)
 
 void writeNestedCommpoundWithVis(const std::string &archiveName)
 {
-    const int numChildren = 2;
+    const size_t numChildren = 2;
 
     // Create an archive for writing. Indicate that we want Alembic to
     //   throw exceptions on errors.
@@ -388,7 +392,7 @@ void writeNestedCommpoundWithVis(const std::string &archiveName)
 
     // Create several objects under top called "child_N"
     // child_1 will be set to have hidden visibility.
-    for (int ii=0; ii<numChildren; ii++)
+    for ( size_t ii=0 ; ii < numChildren ; ++ii )
     {
         // Create 'numChildren' children, all parented under
         //  the archive
@@ -438,13 +442,13 @@ void readNestedCommpoundWithVis(const std::string &archiveName)
     TESTING_ASSERT( !boxProp.valid() );
 
     ICharProperty topVisibility = GetVisibilityProperty (archiveTop);
-    std::cout << "Does this object have VisibilityProperty? " 
+    std::cout << "Does this object have VisibilityProperty? "
               << (bool) (true == topVisibility)
               << std::endl;
     ABCA_ASSERT( topVisibility == false, "top object should not have a visibility property");
 
     // Determine the number of (top level) children the archive has
-    const int numChildren = archiveTop.getNumChildren();
+    const size_t numChildren = archiveTop.getNumChildren();
     ABCA_ASSERT( numChildren == 2, "Wrong number of children (expected 2)");
     std::cout << "The archive has " << numChildren << " children:"
               << std::endl;
@@ -452,7 +456,7 @@ void readNestedCommpoundWithVis(const std::string &archiveName)
     IObject child1;
     IObject otherChild;
     // Iterate through them, print out their names
-    for (int ii=0; ii<numChildren; ii++)
+    for ( size_t ii=0; ii <numChildren; ii++)
     {
         IObject child( archiveTop, archiveTop.getChildHeader(ii).getName() );
         std::cout << "  " << child.getName();
@@ -468,10 +472,12 @@ void readNestedCommpoundWithVis(const std::string &archiveName)
                   << std::endl;
 
         std::vector<std::string> propNames;
-        for (int pp=0; pp<numProperties; pp++)
+        for ( size_t pp=0 ; pp < numProperties ; ++pp )
+        {
             propNames.push_back( props.getPropertyHeader(pp).getName() );
+        }
 
-        for (int jj=0; jj<numProperties; jj++)
+        for ( size_t jj=0; jj<numProperties; ++jj)
         {
             std::cout << "    ..named " << propNames[jj] << std::endl;
 

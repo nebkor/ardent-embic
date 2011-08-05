@@ -54,8 +54,6 @@ namespace ALEMBIC_VERSION_NS {
 //-*****************************************************************************
 // Some MetaData key constants
 static const char * kApplicationNameKey = "_ai_Application";
-static const char * kAlembicVersionKey = "_ai_AlembicVersion";
-static const char * kAlembicApiVersionKey = "_ai_AlembicApiVersion";
 static const char * kDateWrittenKey = "_ai_DateWritten";
 static const char * kUserDescriptionKey = "_ai_Description";
 
@@ -117,36 +115,34 @@ OArchive CreateArchiveWithInfo(
     AbcA::MetaData md = GetMetaData( iArg0, iArg1 );
     ErrorHandler::Policy policy = GetErrorHandlerPolicyFromArgs( iArg0, iArg1 );
 
-    md.set( kApplicationNameKey, iApplicationWriter );
-
-    Util::int32_t ver = ALEMBIC_LIBRARY_VERSION;
-    std::stringstream strm;
-    strm << ver;
-    md.set( kAlembicApiVersionKey, strm.str() );
-    md.set( kAlembicVersionKey, AbcA::GetLibraryVersion() );
+    if ( iApplicationWriter != "" )
+    {
+        md.set( kApplicationNameKey, iApplicationWriter );
+    }
 
     time_t rawtimeNow;
     time( &rawtimeNow );
     char dateBuf [128];
-#ifdef _WIN32 
-    ctime_s( dateBuf, 128, &rawtimeNow);
-#elif defined _WIN64
+#if defined _WIN32 || defined _WIN64
     ctime_s( dateBuf, 128, &rawtimeNow);
 #else
     ctime_r( &rawtimeNow, dateBuf );
 #endif
-    if (strlen( dateBuf ))
+
+    std::size_t bufLen = strlen( dateBuf );
+    if ( bufLen > 0 && dateBuf[bufLen - 1] == '\n' )
     {
-        if (dateBuf[strlen( dateBuf ) -1] == '\n')
-        {
-            dateBuf[strlen( dateBuf ) -1] = '\0';
-        }
+        dateBuf[bufLen - 1] = '\0';
     }
     md.set( kDateWrittenKey, dateBuf );
 
-    md.set( kUserDescriptionKey, iUserDescription );
+    if ( iUserDescription != "" )
+    {
+        md.set( kUserDescriptionKey, iUserDescription );
+    }
 
     return OArchive( iCtor, iFileName, md, policy );
+
 }
 
 
