@@ -89,5 +89,5 @@ int GetStepFromBasisType( const BasisType basis )
     }
 }
 
-}
+} // End namespace AbcGeom
 }

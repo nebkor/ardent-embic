@@ -55,7 +55,7 @@ std::string GetBasisNameFromBasisType( const BasisType basis );
 
 int GetStepFromBasisType(const BasisType basis );
 
-}
+} // End namespace AbcGeom
 }
 
 #endif
