@@ -54,7 +54,6 @@
 #include <Alembic/AbcGeom/IPolyMesh.h>
 #include <Alembic/AbcGeom/ISubD.h>
 #include <Alembic/AbcGeom/IXform.h>
-#include <Alembic/AbcGeom/Visibility.h>
 
 #include "NodeIteratorVisitorHelper.h"
 
@@ -123,8 +122,9 @@ private:
     // member variable related to flags -connect,
     // -createIfNotFound and -removeIfNoUpdate
     std::set<std::string> mRootNodes;
+    bool mAnyRoots;
 
-    MDagPath mCurrentDagNode;
+    MDagPath mConnectDagNode;
 
     Action mAction;
 

@@ -49,7 +49,7 @@ void AbcReader::parsingEnd( const std::string &iStreamName,
 //-*****************************************************************************
 void AbcReader::v( index_t iIndex, const V3d &iPoint )
 {
-    assert( m_vertices.size()+1 == iIndex );
+    assert( ( index_t ) ( m_vertices.size()+1 ) == iIndex );
 
     V3f pt( iPoint.x, iPoint.y, iPoint.z );
 

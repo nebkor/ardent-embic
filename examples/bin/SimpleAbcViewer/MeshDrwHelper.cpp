@@ -51,7 +51,7 @@ MeshDrwHelper::~MeshDrwHelper()
 }
 
 //-*****************************************************************************
-void MeshDrwHelper::update( V3fArraySamplePtr iP,
+void MeshDrwHelper::update( P3fArraySamplePtr iP,
                             V3fArraySamplePtr iN,
                             Int32ArraySamplePtr iIndices,
                             Int32ArraySamplePtr iCounts,
@@ -82,6 +82,7 @@ void MeshDrwHelper::update( V3fArraySamplePtr iP,
     m_meshP = iP;
     m_meshIndices = iIndices;
     m_meshCounts = iCounts;
+    m_triangles.clear ();
 
     // Check stuff.
     if ( !m_meshP ||
@@ -143,7 +144,7 @@ void MeshDrwHelper::update( V3fArraySamplePtr iP,
         for ( size_t fidx = faceIndexBegin;
               fidx < faceIndexEnd; ++fidx )
         {
-            if ( (*m_meshIndices)[fidx] >= numPoints )
+            if ( ( size_t ) ( (*m_meshIndices)[fidx] ) >= numPoints )
             {
                 std::cout << "Mesh update quitting on face: "
                           << face
@@ -197,7 +198,7 @@ void MeshDrwHelper::update( V3fArraySamplePtr iP,
 }
 
 //-*****************************************************************************
-void MeshDrwHelper::update( V3fArraySamplePtr iP,
+void MeshDrwHelper::update( P3fArraySamplePtr iP,
                             V3fArraySamplePtr iN,
                             Abc::Box3d iBounds )
 {

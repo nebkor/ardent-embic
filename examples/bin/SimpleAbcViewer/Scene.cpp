@@ -50,7 +50,6 @@ void setMaterials( float o, bool negMatrix = false )
 
         GLfloat mat_specular[] = { 1.0, 1.0, 1.0, 1.0 };
         GLfloat mat_shininess[] = { 100.0 };
-        GLfloat light_position[] = { 20.0, 20.0, 20.0, 0.0 };
 
         glClearColor( 0.0, 0.0, 0.0, 0.0 );
         glMaterialfv( GL_FRONT, GL_DIFFUSE, mat_front_diffuse );
@@ -66,7 +65,6 @@ void setMaterials( float o, bool negMatrix = false )
 
         GLfloat mat_specular[] = { 1.0, 1.0, 1.0, 1.0 };
         GLfloat mat_shininess[] = { 100.0 };
-        GLfloat light_position[] = { 20.0, 20.0, 20.0, 0.0 };
         GLfloat mat_front_emission[] = {0.0, 0.0, 0.0, 0.0 };
         GLfloat mat_back_emission[] = {o, 0.0, 0.0, o };
 
@@ -100,29 +98,6 @@ Scene::Scene( const std::string &abcFileName )
 
     m_archive = IArchive( Alembic::AbcCoreHDF5::ReadArchive(),
                           abcFileName );
-    
-
-    std::string appName;
-    std::string writerVersion;
-    std::string alembicVersion;
-    std::string whenWritten;
-    std::string userDescription;
-    GetArchiveInfo (m_archive.getPtr(),
-                    appName,
-                    writerVersion,
-                    alembicVersion,
-                    whenWritten,
-                    userDescription);
-    if (appName != "")
-    {
-        std::cout << "  file written by: " << appName << "  version " 
-                  << writerVersion << std::endl;
-        std::cout << "  using Alembic : " << alembicVersion 
-                  << std::endl;
-        std::cout << "  written on : " << whenWritten << std::endl;
-        std::cout << "  user description : " << userDescription << std::endl;
-    }
-
     m_topObject = IObject( m_archive, kTop );
     
     std::cout << "Opened archive and top object, creating drawables."

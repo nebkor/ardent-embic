@@ -54,12 +54,13 @@ namespace ALEMBIC_VERSION_NS {
 // 5/25/2011: Alembic 0.93b 
 // 6/29/2011: Alembic 1.0.rc1 
 // 8/8/2011:  Alembic 1.0.0 
-// This symbol's name gives a meaningful link / dlopen error
+// This symbol's name gives a meaningful link / dlopen / LoadLibrary error
 // message to people if they mismatch plugins to library.
 const char *    kAlembicVersionStringALEMBIC_API_VERSION_1_0rc2 = "1.0.rc2";
 static const char * _kAlembicVersionString = 
 	kAlembicVersionStringALEMBIC_API_VERSION_1_0rc2;
 
+//-*****************************************************************************
 std::string 
 GetLibraryVersionShort()
 {
@@ -67,10 +68,10 @@ GetLibraryVersionShort()
     return versionString;
 }
 
+//-*****************************************************************************
 std::string 
 GetLibraryVersion()
 {
-    // "Alembic 1.0.0 (7/6/2011)"
     const char * date = __DATE__;
     std::string   alembicVersion = GetLibraryVersionShort();
     std::ostringstream sversionString;

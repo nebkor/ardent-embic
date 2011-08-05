@@ -103,7 +103,7 @@ void IPolyMeshSchema::init( const Abc::Argument &iArg0,
     {
         ObjectHeader const & header = _thisObject.getChildHeader (childIndex);
         if ( IFaceSet::matches( header ) )
-    {
+        {
             // start out with an empty (invalid IFaceSet)
             // accessor later on will create real IFaceSet object.
             m_faceSets [header.getName ()] = IFaceSet ();

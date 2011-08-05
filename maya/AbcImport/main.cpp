@@ -34,16 +34,15 @@
 //
 //-*****************************************************************************
 
+#include <maya/MGlobal.h>
 #include <maya/MFnPlugin.h>
 #include <maya/MObject.h>
-#include <maya/MGlobal.h>
 
 #include "AlembicNode.h"
 #include "AbcImport.h"
 
+// Interesting trivia: 0x2697 is the unicode character for Alembic
 const MTypeId AlembicNode::mMayaNodeId(0x00082697);
-
-namespace AbcA = Alembic::AbcCoreAbstract;
 
 MStatus initializePlugin(MObject obj)
 {
@@ -59,15 +58,10 @@ MStatus initializePlugin(MObject obj)
                                 &AlembicNode::creator,
                                 &AlembicNode::initialize);
 
-    // Announce ourselves and our version.
-    MString aboutCommand = "about -version";
-    MString mayaVersion;
-    MGlobal::executeCommand (aboutCommand, mayaVersion, false, false);
-    std::ostringstream sversionString;
-    sversionString << "AbcImport plugin v" << pluginVersion << " for Maya " <<
-        mayaVersion << " for " << AbcA::GetLibraryVersion ();
-    MString info;
-    info = sversionString.str ().c_str ();
+    MString info = "AbcImport v";
+    info += pluginVersion;
+    info += " using ";
+    info += Alembic::AbcCoreAbstract::GetLibraryVersion().c_str();
     MGlobal::displayInfo(info);
 
     return status;

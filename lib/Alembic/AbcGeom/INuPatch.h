@@ -187,7 +187,7 @@ public:
                     const std::string &iName,
                     const Abc::Argument &iArg0 = Abc::Argument(),
                     const Abc::Argument &iArg1 = Abc::Argument() )
-      : Abc::ISchema<NuPatchSchemaInfo>( iParent, iName,
+      : IGeomBaseSchema<NuPatchSchemaInfo>( iParent, iName,
                                          iArg0, iArg1 )
     {
         init( iArg0, iArg1 );
