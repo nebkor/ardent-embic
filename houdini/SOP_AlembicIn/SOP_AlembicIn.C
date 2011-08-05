@@ -230,6 +230,26 @@ OP_ERROR SOP_AlembicIn::cookMySop(OP_Context &context)
     UT_WorkBuffer fileobjecthash;
     fileobjecthash.sprintf("%s:%s:%d", fileName.c_str(), objectPath.c_str(),
             args.includeXform);
+    
+    
+    int nmapSize = evalInt("remapAttributes", 0, now);
+    // Entries are one based (not zero based)
+    for (int i = 1; i <= nmapSize; ++i)
+    {
+        UT_String abcName, hName;
+        evalStringInst("abcName#", &i, abcName, 0, now);
+        evalStringInst("hName#", &i, hName, 0, now);
+        if (abcName.isstring() && hName.isstring())
+        {
+            nameMap[abcName.toStdString()] = hName.toStdString();
+            
+            // Incorporate attribute remapping values into the fileobjecthash
+            // so that recooks reflect the new state even for constant data
+            fileobjecthash.sprintf(":%s->%s",
+                    (const char *)abcName, (const char *)hName);
+        }
+    }
+    
     if (strcmp(myFileObjectCache, fileobjecthash.buffer()) != 0)
     {
         myFileObjectCache.harden(fileobjecthash.buffer());
@@ -264,19 +284,6 @@ OP_ERROR SOP_AlembicIn::cookMySop(OP_Context &context)
 #else
         gdp->destroyPointAttrib("internalN", sizeof(UT_Vector3), GB_ATTRIB_MIXED);
 #endif
-    }
-    
-    int nmapSize = evalInt("remapAttributes", 0, now);
-    // Entries are one based (not zero based)
-    for (int i = 1; i <= nmapSize; ++i)
-    {
-        UT_String abcName, hName;
-        evalStringInst("abcName#", &i, abcName, 0, now);
-        evalStringInst("hName#", &i, hName, 0, now);
-        if (abcName.isstring() && hName.isstring())
-        {
-            nameMap[abcName.toStdString()] = hName.toStdString();
-        }
     }
     
     
@@ -1820,24 +1827,56 @@ namespace
                     double top, bottom, left, right;
                     cameraSample.getScreenWindow(top, bottom, left, right);
                     
-//                     val = PY_PyFloat_FromDouble((right-left)/2.0 + left);
-//                     PY_PyDict_SetItemString(resultDict, "winx", val);
-//                     PY_Py_DECREF(val);
-//                     
-//                     val = PY_PyFloat_FromDouble((top-bottom)/2.0 + bottom);
-//                     PY_PyDict_SetItemString(resultDict, "winy", val);
-//                     PY_Py_DECREF(val);
-//                     
-//                     val = PY_PyFloat_FromDouble(right-left);
-//                     PY_PyDict_SetItemString(resultDict, "winsizex", val);
-//                     PY_Py_DECREF(val);
-//                     
-//                     val = PY_PyFloat_FromDouble(top-bottom);
-//                     PY_PyDict_SetItemString(resultDict, "winsizey", val);
-//                     PY_Py_DECREF(val);
+                    double winx = cameraSample.getHorizontalFilmOffset() *
+                            cameraSample.getLensSqueezeRatio() /
+                                    cameraSample.getHorizontalAperture();
+                    
+                    double winy = cameraSample.getVerticalFilmOffset() *
+                            cameraSample.getLensSqueezeRatio() /
+                                    cameraSample.getVerticalAperture();
+                    
+                    //TODO, full 2D transformations
+                    
+                    Abc::V2d postScale(1.0, 1.0);
+                    for ( size_t i = 0; i < cameraSample.getNumOps(); ++i )
+                    {
+                        const FilmBackXformOp & op = cameraSample.getOp(i);
+                        
+                        if ( op.isScaleOp() )
+                        {
+                            postScale *= op.getScale();
+                        }
+                    }
+                    
+                    //TODO overscan
+                    double winsizex =
+                            cameraSample.getLensSqueezeRatio() / postScale[0];
+                    //TODO overscan
+                    double winsizey =
+                            cameraSample.getLensSqueezeRatio() / postScale[1];
+                    
+                    
+                    
+                    
+                    
+                    val = PY_PyFloat_FromDouble(winx);
+                    PY_PyDict_SetItemString(resultDict, "winx", val);
+                    PY_Py_DECREF(val);
+                    
+                    val = PY_PyFloat_FromDouble(winy);
+                    PY_PyDict_SetItemString(resultDict, "winy", val);
+                    PY_Py_DECREF(val);
+                    
+                    val = PY_PyFloat_FromDouble(winsizex);
+                    PY_PyDict_SetItemString(resultDict, "winsizex", val);
+                    PY_Py_DECREF(val);
+                    
+                    val = PY_PyFloat_FromDouble(winsizey);
+                    PY_PyDict_SetItemString(resultDict, "winsizey", val);
+                    PY_Py_DECREF(val);
                     
                     val = PY_PyFloat_FromDouble(
-                            cameraSample.getHorizontalAperture()*10.0*(right-left));
+                            cameraSample.getHorizontalAperture()*10.0);
                     PY_PyDict_SetItemString(resultDict, "aperture", val);
                     PY_Py_DECREF(val);
                     
