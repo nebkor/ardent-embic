@@ -459,6 +459,6 @@ typedef OTypedGeomParam<N3dTPTraits>             ON3dGeomParam;
 using namespace ALEMBIC_VERSION_NS;
 
 } // End namespace AbcGeom
-} // namespace Alembic
+} // End namespace Alembic
 
 #endif

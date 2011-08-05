@@ -37,6 +37,7 @@
 #include <Alembic/AbcCoreHDF5/All.h>
 #include <Alembic/Abc/All.h>
 #include <Alembic/AbcGeom/Visibility.h>
+#include <Alembic/AbcGeom/ArchiveBounds.h>
 #include <boost/random.hpp>
 #include <boost/lexical_cast.hpp>
 
@@ -373,7 +374,7 @@ void readSimpleProperties(const std::string &archiveName)
 
 void writeNestedCommpoundWithVis(const std::string &archiveName)
 {
-    const unsigned int numChildren = 2;
+    const int numChildren = 2;
 
     // Create an archive for writing. Indicate that we want Alembic to
     //   throw exceptions on errors.
@@ -429,6 +430,12 @@ void readNestedCommpoundWithVis(const std::string &archiveName)
                       archiveName, ErrorHandler::kThrowPolicy );
     IObject archiveTop = archive.getTop();
 
+    TESTING_ASSERT_THROW( GetIArchiveBounds( archive ),
+                          Alembic::Util::Exception );
+
+    IBox3dProperty boxProp = GetIArchiveBounds( archive,
+                                               ErrorHandler::kQuietNoopPolicy );
+    TESTING_ASSERT( !boxProp.valid() );
 
     ICharProperty topVisibility = GetVisibilityProperty (archiveTop);
     std::cout << "Does this object have VisibilityProperty? " 
@@ -437,7 +444,7 @@ void readNestedCommpoundWithVis(const std::string &archiveName)
     ABCA_ASSERT( topVisibility == false, "top object should not have a visibility property");
 
     // Determine the number of (top level) children the archive has
-    const unsigned int numChildren = archiveTop.getNumChildren();
+    const int numChildren = archiveTop.getNumChildren();
     ABCA_ASSERT( numChildren == 2, "Wrong number of children (expected 2)");
     std::cout << "The archive has " << numChildren << " children:"
               << std::endl;

@@ -79,8 +79,9 @@ void IPolyMeshSchema::init( const Abc::Argument &iArg0,
 
     AbcA::CompoundPropertyReaderPtr _this = this->getPtr();
 
-    m_positionsProperty = Abc::IV3fArrayProperty( _this, "P",
-                                          args.getSchemaInterpMatching() );
+    // no matching so we pick up old assets written as V3f
+    m_positionsProperty = Abc::IP3fArrayProperty( _this, "P", kNoMatching );
+
     m_indicesProperty = Abc::IInt32ArrayProperty( _this, ".faceIndices",
                                         args.getSchemaInterpMatching() );
     m_countsProperty = Abc::IInt32ArrayProperty( _this, ".faceCounts",
@@ -122,27 +123,27 @@ IPolyMeshSchema::operator=(const IPolyMeshSchema & rhs)
 {
     IGeomBaseSchema<PolyMeshSchemaInfo>::operator=(rhs);
 
+    m_positionsProperty = rhs.m_positionsProperty;
+    m_indicesProperty   = rhs.m_indicesProperty;
+    m_countsProperty    = rhs.m_countsProperty;
+
+    m_uvsParam          = rhs.m_uvsParam;
+    m_normalsParam      = rhs.m_normalsParam;
+
     // lock, reset
     boost::mutex::scoped_lock l(m_faceSetsMutex);
     m_faceSetsLoaded = false;
     m_faceSets.clear ();
 
-    m_positionsProperty = rhs.m_positionsProperty;
-    m_indicesProperty   = rhs.m_indicesProperty;
-    m_countsProperty    = rhs.m_countsProperty;
-                                           
-    m_uvsParam          = rhs.m_uvsParam;
-    m_normalsParam      = rhs.m_normalsParam;
-
     return *this;
 }
 
 //-*****************************************************************************
-void IPolyMeshSchema::_loadFaceSetNames()
+void IPolyMeshSchema::loadFaceSetNames()
 {
     // Caller must ensure they have locked m_faceSetsMutex.
     // (allows us to use non-recursive mutex)
-    ALEMBIC_ABC_SAFE_CALL_BEGIN( "IPolyMeshSchema::_loadFaceSetNames()" );
+    ALEMBIC_ABC_SAFE_CALL_BEGIN( "IPolyMeshSchema::loadFaceSetNames()" );
 
     if (!m_faceSetsLoaded)
     {
@@ -173,7 +174,7 @@ void IPolyMeshSchema::getFaceSetNames( std::vector<std::string> &oFaceSetNames )
     ALEMBIC_ABC_SAFE_CALL_BEGIN( "IPolyMeshSchema::getFaceSetNames()" );
 
     boost::mutex::scoped_lock l(m_faceSetsMutex);
-    _loadFaceSetNames();
+    loadFaceSetNames();
 
     for ( std::map<std::string, IFaceSet>::const_iterator faceSetIter =
               m_faceSets.begin(); faceSetIter != m_faceSets.end();
@@ -194,7 +195,7 @@ IPolyMeshSchema::hasFaceSet( const std::string &iFaceSetName )
     boost::mutex::scoped_lock l(m_faceSetsMutex);
     if (!m_faceSetsLoaded)
     {
-        _loadFaceSetNames();
+        loadFaceSetNames();
     }
 
     return (m_faceSets.find (iFaceSetName) != m_faceSets.end ());
@@ -212,7 +213,7 @@ IPolyMeshSchema::getFaceSet ( const std::string &iFaceSetName )
     boost::mutex::scoped_lock l(m_faceSetsMutex);
     if (!m_faceSetsLoaded)
     {
-        _loadFaceSetNames();
+        loadFaceSetNames();
     }
 
     ABCA_ASSERT( m_faceSets.find (iFaceSetName) != m_faceSets.end (),

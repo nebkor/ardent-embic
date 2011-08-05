@@ -66,7 +66,7 @@ public:
         Sample() { reset(); }
 
         Sample(
-                const Abc::V3fArraySample &iPos,
+                const Abc::P3fArraySample &iPos,
                 const int32_t &iNumU,
                 const int32_t &iNumV,
                 const int32_t &iUOrder,
@@ -99,8 +99,8 @@ public:
             {}
 
         // positions
-        const Abc::V3fArraySample &getPositions() const { return m_positions; }
-        void setPositions( const Abc::V3fArraySample &iSmp )
+        const Abc::P3fArraySample &getPositions() const { return m_positions; }
+        void setPositions( const Abc::P3fArraySample &iSmp )
         { m_positions = iSmp; }
 
         // position weights, if it isn't set, it's 1 for every point
@@ -110,22 +110,22 @@ public:
         { m_positionWeights = iSmp; }
 
         // nu
-        const int32_t getNu() const { return m_numU; }
+        int32_t getNu() const { return m_numU; }
         void setNu( const int32_t iNu )
         { m_numU = iNu; }
 
         // nv
-        const int32_t getNv() const { return m_numV; }
+        int32_t getNv() const { return m_numV; }
         void setNv( const int32_t iNv )
         { m_numV = iNv; }
 
         // uOrder
-        const int32_t getUOrder() const { return m_uOrder; }
+        int32_t getUOrder() const { return m_uOrder; }
         void setUOrder( const int32_t iUOrder )
         { m_uOrder = iUOrder; }
 
         // vOrder
-        const int32_t getVOrder() const { return m_vOrder; }
+        int32_t getVOrder() const { return m_vOrder; }
         void setVOrder( const int32_t iVOrder )
         { m_vOrder = iVOrder; }
 
@@ -184,7 +184,7 @@ public:
             m_hasTrimCurve = true;
         }
 
-        const int32_t getTrimNumLoops() const { return m_trimNumLoops; }
+        int32_t getTrimNumLoops() const { return m_trimNumLoops; }
         const Abc::Int32ArraySample &getTrimNumCurves() const
         { return m_trimNumCurves; }
         const Abc::Int32ArraySample &getTrimNumVertices() const
@@ -198,7 +198,7 @@ public:
         const Abc::FloatArraySample &getTrimV() const { return m_trimV; }
         const Abc::FloatArraySample &getTrimW() const { return m_trimW; }
 
-        const bool hasTrimCurve() const
+        bool hasTrimCurve() const
         {
             return m_hasTrimCurve;
         }
@@ -235,7 +235,7 @@ public:
     protected:
 
         // required properties
-        Abc::V3fArraySample m_positions;
+        Abc::P3fArraySample m_positions;
         int32_t m_numU;
         int32_t m_numV;
         int32_t m_uOrder;
@@ -249,7 +249,7 @@ public:
         OV2fGeomParam::Sample m_uvs;
 
         // optional trim curves
-        uint64_t m_trimNumLoops;
+        int32_t m_trimNumLoops;
         Abc::Int32ArraySample m_trimNumCurves;
         Abc::Int32ArraySample m_trimNumVertices;
         Abc::Int32ArraySample m_trimOrder;
@@ -349,6 +349,7 @@ public:
 
     //! Copy constructor.
     ONuPatchSchema(const ONuPatchSchema& iCopy)
+        : OGeomBaseSchema<NuPatchSchemaInfo>()
     {
         *this = iCopy;
     }
@@ -432,7 +433,7 @@ protected:
     AbcA::index_t m_timeSamplingIndex;
 
     // point data
-    Abc::OV3fArrayProperty m_positionsProperty;
+    Abc::OP3fArrayProperty m_positionsProperty;
 
     // required properties
     Abc::OInt32Property m_numUProperty;

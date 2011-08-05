@@ -167,7 +167,7 @@ ALEMBIC_ABCGEOM_DECLARE_SCHEMA_INFO( "AbcGeom_GeomBase_v1",
 using namespace ALEMBIC_VERSION_NS;
 
 } // End namespace AbcGeom
-}
+} // End namespace Alembic
 
 
 #endif // header guard

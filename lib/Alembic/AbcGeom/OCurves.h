@@ -82,7 +82,7 @@ public:
 
         //! Creates a sample with position data but no index
         //! or count data. For specifying samples after the first one
-        Sample( const Abc::V3fArraySample &iPos )
+        Sample( const Abc::P3fArraySample &iPos )
           : m_positions( iPos )
         {
             // even though this might not be written out
@@ -100,7 +100,7 @@ public:
         //! sample must be full like this. Subsequent samples may also
         //! be full like this, which would indicate a change of topology
         Sample(
-                const Abc::V3fArraySample &iPos,
+                const Abc::P3fArraySample &iPos,
                 const Abc::Int32ArraySample &iNVertices,
                 const CurveType &iType = kCubic,
                 const CurvePeriodicity iWrap = kNonPeriodic,
@@ -124,8 +124,8 @@ public:
         { m_widths = iWidths; }
 
         // positions accessor
-        const Abc::V3fArraySample &getPositions() const { return m_positions; }
-        void setPositions( const Abc::V3fArraySample &iSmp )
+        const Abc::P3fArraySample &getPositions() const { return m_positions; }
+        void setPositions( const Abc::P3fArraySample &iSmp )
         { m_positions = iSmp; }
 
         // type accessors
@@ -138,7 +138,7 @@ public:
         { m_wrap = iWrap; }
         CurvePeriodicity getWrap() const { return m_wrap; }
 
-        const std::size_t getNumCurves() const { return m_nVertices.size(); }
+        std::size_t getNumCurves() const { return m_nVertices.size(); }
 
         //! an array of ints that corresponds to the number
         //! of vertices per curve
@@ -191,7 +191,7 @@ public:
     protected:
 
         // properties
-        Abc::V3fArraySample m_positions;
+        Abc::P3fArraySample m_positions;
         Abc::Int32ArraySample m_nVertices;
 
         CurveType m_type;
@@ -287,6 +287,7 @@ public:
     }
 
     OCurvesSchema( const OCurvesSchema& iCopy )
+        : OGeomBaseSchema<CurvesSchemaInfo>()
     {
         *this = iCopy;
     }
@@ -356,7 +357,7 @@ protected:
     void init( const AbcA::index_t iTsIdx );
 
     // point data
-    Abc::OV3fArrayProperty m_positionsProperty;
+    Abc::OP3fArrayProperty m_positionsProperty;
     Abc::OInt32ArrayProperty m_nVerticesProperty;
 
     // per-point data

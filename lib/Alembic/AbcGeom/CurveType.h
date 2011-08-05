@@ -58,6 +58,6 @@ enum CurveType {
 using namespace ALEMBIC_VERSION_NS;
 
 } // End namespace AbcGeom
-}
+} // End namespace Alembic
 
 #endif

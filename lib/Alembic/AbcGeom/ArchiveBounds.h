@@ -1,7 +1,7 @@
 //-*****************************************************************************
 //
 // Copyright (c) 2009-2011,
-//  Sony Pictures Imageworks Inc. and
+//  Sony Pictures Imageworks, Inc. and
 //  Industrial Light & Magic, a division of Lucasfilm Entertainment Company Ltd.
 //
 // All rights reserved.
@@ -16,7 +16,7 @@
 // in the documentation and/or other materials provided with the
 // distribution.
 // *       Neither the name of Sony Pictures Imageworks, nor
-// Industrial Light & Magic, nor the names of their contributors may be used
+// Industrial Light & Magic nor the names of their contributors may be used
 // to endorse or promote products derived from this software without specific
 // prior written permission.
 //
@@ -34,11 +34,34 @@
 //
 //-*****************************************************************************
 
-#ifndef _Alembic_GLUtil_All_h_
-#define _Alembic_GLUtil_All_h_
+#ifndef _Alembic_AbcGeom_ArchiveBounds_h_
+#define _Alembic_AbcGeom_ArchiveBounds_h_
 
-#include <Alembic/GLUtil/Foundation.h>
-#include <Alembic/GLUtil/GLEWInit.h>
-#include <Alembic/GLUtil/GlslProgram.h>
+#include <Alembic/AbcGeom/Foundation.h>
+
+namespace Alembic {
+namespace AbcGeom {
+namespace ALEMBIC_VERSION_NS {
+
+//! Helper function that gets the bounds property off of the top object if
+//! it exists, if it doesn't exist an invalid IBox3dProperty is returned.
+//! Arguments can specify error handling policy or protocol matching policy.
+Abc::IBox3dProperty GetIArchiveBounds( IArchive & iArchive,
+                                       const Argument &iArg0 = Argument(),
+                                       const Argument &iArg1 = Argument() );
+
+//! Helper function that creates the bounds property off of the top object
+//! Arguments can specify metadata, timesampling, and error handling.
+Abc::OBox3dProperty CreateOArchiveBounds( OArchive & iArchive,
+                                          const Argument &iArg0 = Argument(),
+                                          const Argument &iArg1 = Argument(),
+                                          const Argument &iArg2 = Argument() );
+
+} // End namespace ALEMBIC_VERSION_NS
+
+using namespace ALEMBIC_VERSION_NS;
+
+} // End namespace AbcGeom
+} // End namespace Alembic
 
 #endif

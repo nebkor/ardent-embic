@@ -329,7 +329,7 @@ ITypedGeomParam<TRAITS>::getIndexed( typename ITypedGeomParam<TRAITS>::Sample &o
     if ( m_indicesProperty ) { m_indicesProperty.get( oSamp.m_indices, iSS ); }
     else
     {
-        uint32_t size = oSamp.m_vals->size();
+        uint32_t size = static_cast< uint32_t > ( oSamp.m_vals->size() );
 
         uint32_t *v = new uint32_t[size];
 
@@ -567,6 +567,6 @@ typedef ITypedGeomParam<N3dTPTraits>             IN3dGeomParam;
 using namespace ALEMBIC_VERSION_NS;
 
 } // End namespace AbcGeom
-} // namespace Alembic
+} // End namespace Alembic
 
 #endif

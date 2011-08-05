@@ -189,7 +189,8 @@ void StupidData()
         {
             std::vector<int32_t> v( i, i );
             intArrayProp.set( v );
-            TESTING_ASSERT( intArrayProp.getNumSamples() == i + 1 );
+            TESTING_ASSERT( intArrayProp.getNumSamples() ==
+                            ( size_t ) ( i + 1 ) );
         }
         std::cout << std::endl << "Writing " << archiveName << std::endl;
     }
