@@ -44,6 +44,7 @@ namespace ALEMBIC_VERSION_NS {
 // This is here as a minimal compile test against which the TypedScalar stuff
 // has to compile. It's to avoid not knowing that stuff in the templates
 // is very broken until much later.
+namespace {
 void __test( OObject &iObject )
 {
     OBoolArrayProperty boolProp( OCompoundProperty( iObject, kTop ),
@@ -59,7 +60,7 @@ void __test( OObject &iObject )
     std::vector<bool_t> bools( 17 );
     boolProp.set( bools );
 }
-
+}
 } // End namespace ALEMBIC_VERSION_NS
 } // End namespace Abc
 } // End namespace Alembic

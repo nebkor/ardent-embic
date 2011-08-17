@@ -44,6 +44,7 @@ namespace ALEMBIC_VERSION_NS {
 // This is here as a minimal compile test against which the TypedScalar stuff
 // has to compile. It's to avoid not knowing that stuff in the templates
 // is very broken until much later.
+namespace {
 void __test( IObject &iObject )
 {
     IBoolArrayProperty boolProp( ICompoundProperty( iObject, kTop ),
@@ -58,6 +59,7 @@ void __test( IObject &iObject )
 
     BoolArraySamplePtr bPtr;
     boolProp.get( bPtr );
+}
 }
 
 } // End namespace ALEMBIC_VERSION_NS

@@ -44,12 +44,13 @@ namespace ALEMBIC_VERSION_NS {
 // This is here as a minimal compile test against which the TypedScalar stuff
 // has to compile. It's to avoid not knowing that stuff in the templates
 // is very broken until much later.
+namespace {
 void __test( IObject &iObject )
 {
     IBoolProperty boolProp( ICompoundProperty( iObject, kTop ),
                             "boolProp" );
     IInt32Property intProp( ICompoundProperty( iObject, kTop ),
-                          "intProp" );
+                            "intProp" );
     IInt32Property intProp2( intProp.getPtr(), kWrapExisting );
 
     int32_t i;
@@ -58,6 +59,7 @@ void __test( IObject &iObject )
 
     bool_t b;
     boolProp.get( b );
+}
 }
 
 } // End namespace ALEMBIC_VERSION_NS
