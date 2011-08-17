@@ -46,6 +46,7 @@ namespace {
 // This is here as a minimal compile test against which the TypedScalar stuff
 // has to compile. It's to avoid not knowing that stuff in the templates
 // is very broken until much later.
+namespace {
 void __test( OObject &iObject )
 {
     OBoolProperty boolProp( OCompoundProperty( iObject, kTop ),
@@ -59,7 +60,7 @@ void __test( OObject &iObject )
 
     boolProp.set( false );
 }
-
+}
 }
 
 } // End namespace ALEMBIC_VERSION_NS
